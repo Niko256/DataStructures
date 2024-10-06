@@ -177,6 +177,18 @@ public:
         ++size_;
     }
 
+
+    template <typename... Args>
+    void emplace_back(Args&&... args) {
+        if (size_ == capacity_) {
+            reserve(capacity_ == 0 ? 1 : capacity_ * 2);
+        }
+        std::allocator_traits<Allocator>::construct(allocator_, data_ + size_, std::forward<Args>(args)...);
+        ++size_;
+    }
+
+
+
     void pop_back() {
         if (size_ > 0) {
             --size_;
