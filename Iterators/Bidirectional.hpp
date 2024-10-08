@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Categories.hpp"
-#include <cstddef>
 
 template <typename T>
 class BidirectionalIterator {
@@ -10,8 +9,6 @@ private:
 
 public:
     using iterator_category = BidirectionalIteratorTag;
-    using value_type = T;
-    using difference_type = ptrdiff_t;
     using pointer = T*;
     using reference = T&;
 
@@ -63,8 +60,6 @@ private:
 
 public:
     using iterator_category = BidirectionalIteratorTag;
-    using value_type = T;
-    using difference_type = ptrdiff_t;
     using pointer = const T*;
     using reference = const T&;
 

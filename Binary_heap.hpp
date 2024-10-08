@@ -73,7 +73,7 @@ T BinaryHeap<T>::extract_min() {
     }
     T min_item = data[0];
     data[0] = data[data.size() - 1];
-    data.pop_back();
+    data.pop_back()();
     if (!data.empty()) {
         sift_down(0);
     }

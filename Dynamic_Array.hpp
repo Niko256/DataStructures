@@ -1,6 +1,8 @@
 #pragma once
+
+#include "Iterators/Reverse.hpp"
+#include "Iterators/Random_Access.hpp"
 #include <cstddef>
-#include <algorithm>
 #include <memory>
 #include <stdexcept>
 
@@ -13,18 +15,13 @@ private:
     Allocator allocator_;
 
 public:
-    using value_type = T;
     using allocator_type = Allocator;
-    using size_type = size_t;
-    using difference_type = ptrdiff_t;
-    using reference = value_type&;
-    using const_reference = const value_type&;
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
-    using iterator = T*;
-    using const_iterator = const T*;
-    using reverse_iterator = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using iterator = RandomAccessIterator<T>;
+    using const_iterator = ConstRandomAccessIterator<T>;
+    using reverse_iterator = ReverseRandomAccessIterator<iterator>;
+    using const_reverse_iterator = ReverseRandomAccessIterator<const_iterator>;
 
     DynamicArray() : data_(nullptr), size_(0), capacity_(0) {}
 
@@ -46,7 +43,7 @@ public:
         }
     }
 
-    DynamicArray(DynamicArray&& other) noexcept : data_(other.data_), size_(other.size_), capacity_(other.capacity_), allocator_(std::move(other.allocator_)) {
+    DynamicArray(DynamicArray&& other) noexcept : data_(std::move(other.data_)), size_(other.size_), capacity_(other.capacity_), allocator_(std::move(other.allocator_)) {
         other.data_ = nullptr;
         other.size_ = 0;
         other.capacity_ = 0;
@@ -130,26 +127,26 @@ public:
     }
 
     iterator begin() noexcept {
-        return data_;
+        return iterator(data_);
     }
 
-    const_iterator begin() const noexcept {
-        return data_;
+    const_iterator cbegin() const noexcept {
+        return const_iterator(data_);
     }
 
     iterator end() noexcept {
-        return data_ + size_;
+        return iterator(data_ + size_);
     }
 
-    const_iterator end() const noexcept {
-        return data_ + size_;
+    const_iterator cend() const noexcept {
+        return const_iterator(data_ + size_);
     }
 
     reverse_iterator rbegin() noexcept {
         return reverse_iterator(end());
     }
 
-    const_reverse_iterator rbegin() const noexcept {
+    const_reverse_iterator crbegin() const noexcept {
         return const_reverse_iterator(end());
     }
 
@@ -157,7 +154,7 @@ public:
         return reverse_iterator(begin());
     }
 
-    const_reverse_iterator rend() const noexcept {
+    const_reverse_iterator crend() const noexcept {
         return const_reverse_iterator(begin());
     }
 
@@ -177,7 +174,6 @@ public:
         ++size_;
     }
 
-
     template <typename... Args>
     void emplace_back(Args&&... args) {
         if (size_ == capacity_) {
@@ -187,13 +183,32 @@ public:
         ++size_;
     }
 
-
-
     void pop_back() {
         if (size_ > 0) {
             --size_;
             std::allocator_traits<Allocator>::destroy(allocator_, data_ + size_);
         }
+    }
+
+    void erase(size_t index) {
+        if (index >= size_) {
+            throw std::out_of_range("Index out of range");
+        }
+
+        std::allocator_traits<Allocator>::destroy(allocator_, data_ + index);
+
+        for (size_t i = index; i < size_ - 1; ++i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i + 1]));
+            std::allocator_traits<Allocator>::destroy(allocator_, data_ + i + 1);
+        }
+
+        --size_;
+    }
+
+    iterator erase(iterator pos) {
+        size_t index = pos - begin();
+        erase(index);
+        return begin() + index;
     }
 
     void reserve(size_t new_capacity) {

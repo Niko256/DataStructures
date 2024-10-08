@@ -11,7 +11,6 @@ private:
 public:
     using iterator_category = RandomAccessIteratorTag;
     using value_type = T;
-    using difference_type = ptrdiff_t;
     using pointer = T*;
     using reference = T&;
 
@@ -47,29 +46,29 @@ public:
         return tmp;
     }
 
-    RandomAccessIterator& operator+=(difference_type n) {
+    RandomAccessIterator& operator+=(ptrdiff_t n) {
         current_ += n;
         return *this;
     }
 
-    RandomAccessIterator& operator-=(difference_type n) {
+    RandomAccessIterator& operator-=(ptrdiff_t n) {
         current_ -= n;
         return *this;
     }
 
-    RandomAccessIterator operator+(difference_type n) const {
+    RandomAccessIterator operator+(ptrdiff_t n) const {
         return RandomAccessIterator(current_ + n);
     }
 
-    RandomAccessIterator operator-(difference_type n) const {
+    RandomAccessIterator operator-(ptrdiff_t n) const {
         return RandomAccessIterator(current_ - n);
     }
 
-    difference_type operator-(const RandomAccessIterator& other) const {
+    ptrdiff_t operator-(const RandomAccessIterator& other) const {
         return current_ - other.current_;
     }
 
-    reference operator[](difference_type n) const {
+    reference operator[](ptrdiff_t n) const {
         return current_[n];
     }
 
@@ -107,8 +106,6 @@ private:
 
 public:
     using iterator_category = RandomAccessIteratorTag;
-    using value_type = T;
-    using difference_type = ptrdiff_t;
     using pointer = const T*;
     using reference = const T&;
 
@@ -144,29 +141,29 @@ public:
         return tmp;
     }
 
-    ConstRandomAccessIterator& operator+=(difference_type n) {
+    ConstRandomAccessIterator& operator+=(ptrdiff_t n) {
         current_ += n;
         return *this;
     }
 
-    ConstRandomAccessIterator& operator-=(difference_type n) {
+    ConstRandomAccessIterator& operator-=(ptrdiff_t n) {
         current_ -= n;
         return *this;
     }
 
-    ConstRandomAccessIterator operator+(difference_type n) const {
+    ConstRandomAccessIterator operator+(ptrdiff_t n) const {
         return ConstRandomAccessIterator(current_ + n);
     }
 
-    ConstRandomAccessIterator operator-(difference_type n) const {
+    ConstRandomAccessIterator operator-(ptrdiff_t n) const {
         return ConstRandomAccessIterator(current_ - n);
     }
 
-    difference_type operator-(const ConstRandomAccessIterator& other) const {
+    ptrdiff_t operator-(const ConstRandomAccessIterator& other) const {
         return current_ - other.current_;
     }
 
-    reference operator[](difference_type n) const {
+    reference operator[](ptrdiff_t n) const {
         return current_[n];
     }
 
