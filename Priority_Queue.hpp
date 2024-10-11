@@ -71,6 +71,26 @@ private:
 public:
     PriorityQueue() = default;
 
+    PriorityQueue(const PriorityQueue& other) : queue(other.queue) {}
+
+    PriorityQueue(PriorityQueue&& other) noexcept : queue(std::move(other.queue)) {}
+
+    ~PriorityQueue() = default;
+
+    PriorityQueue& operator=(const PriorityQueue& other) {
+        if (this != &other) {
+            queue = other.queue;
+        }
+        return *this;
+    }
+
+    PriorityQueue& operator=(PriorityQueue&& other) noexcept {
+        if (this != &other) {
+            queue = std::move(other.queue);
+        }
+        return *this;
+    }
+
     void push(const long priority, const T& item);
     
     T extract_min();
@@ -115,7 +135,7 @@ void PriorityQueue<T>::Concat(const PriorityQueue<T>& other_q) {
 
 template <typename T>
 DynamicArray<PriorityNode<T>> PriorityQueue<T>::get_subqueue(size_t start_index, size_t end_index) {
-    if (start_index < 0 || end_index > queue.size() || start_index > end_index) {
+    if (start_index >= queue.size() || end_index > queue.size() || start_index > end_index) {
         throw std::out_of_range("Index out of range");
     }
 
@@ -124,6 +144,17 @@ DynamicArray<PriorityNode<T>> PriorityQueue<T>::get_subqueue(size_t start_index,
         result.push_back(queue.get_element(i));
     }
     return result;
+}
+
+template <typename T>
+void PriorityQueue<T>::change_priority(const long old_priority, const long new_priority) {
+    DynamicArray<PriorityNode<T>> elements = queue.get_elements();
+    for (size_t i = 0; i < elements.size(); ++i) {
+        if (elements[i].priority == old_priority) {
+            elements[i].change_priority(new_priority);
+            queue.set_element(i, elements[i]);
+        }
+    }
 }
 
 template <typename T>

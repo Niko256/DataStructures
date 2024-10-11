@@ -2,136 +2,115 @@
 
 #include "Dynamic_Array.hpp"
 #include <stdexcept>
-#include <iostream> 
+#include <iostream>
 
 template <typename T>
 class Stack {
 private:
-    DynamicArray<T> array;
+    DynamicArray<T> container_;
 
 public:
-    Stack() : array() {}
-    
-    ~Stack() {
-        array.clear();
+    Stack() = default;
+    ~Stack() = default;
+
+    Stack(const DynamicArray<T>& cont) : container_(cont) {}
+    Stack(DynamicArray<T>&& cont) noexcept : container_(std::move(cont)) {}
+
+    Stack(const Stack& other) : container_(other.container_) {}
+    Stack(Stack&& other) noexcept : container_(std::move(other.container_)) {}
+
+    Stack& operator=(const Stack& other) {
+        if (this != &other) {
+            container_ = other.container_;
+        }
+        return *this;
     }
 
-    Stack(DynamicArray<T>& arr) : array(arr) {}
+    Stack& operator=(Stack&& other) noexcept {
+        if (this != &other) {
+            container_ = std::move(other.container_);
+        }
+        return *this;
+    }
 
-    Stack(const Stack<T>& other_stack) : array(other_stack.array) {}
+    T top() const {
+        if (container_.empty()) {
+            throw std::runtime_error("Stack is empty");
+        }
+        return container_.back();
+    }
 
-    T top() const;
+    void pop() {
+        if (container_.empty()) {
+            throw std::runtime_error("Stack is empty");
+        }
+        container_.pop_back();
+    }
 
-    void pop();
+    void push(const T& element) {
+        container_.push_back(element);
+    }
 
-    void push(const T& element);
+    void push(T&& element) {
+        container_.push_back(std::move(element));
+    }
 
-    Stack<T> reverse();
+    template <typename... Args>
+    void emplace(Args&&... args) {
+        container_.emplace_back(std::forward<Args>(args)...);
+    }
 
-    size_t size() const;
+    Stack reverse() const {
+        Stack reversed_stack;
+        DynamicArray<T> temp_container = container_;
+        while (!temp_container.empty()) {
+            reversed_stack.push(temp_container.back());
+            temp_container.pop_back();
+        }
+        return reversed_stack;
+    }
 
-    Stack<T> concat(Stack<T>& other_stack);
+    size_t size() const {
+        return container_.size();
+    }
 
-    Stack<T> substack(size_t start_index, size_t end_index);
+    Stack concat(const Stack& other) const {
+        Stack result = *this;
+        DynamicArray<T> temp_container = other.container_;
+        while (!temp_container.empty()) {
+            result.push(temp_container.back());
+            temp_container.pop_back();
+        }
+        return result;
+    }
 
-    bool empty() const;
-    
-    Stack<T>& operator=(const Stack<T>& other_stack);
+    Stack substack(size_t start_index, size_t end_index) const {
+        if (end_index >= container_.size() || start_index > end_index) {
+            throw std::out_of_range("Index out of range");
+        }
+        Stack temp_stack;
+        for (size_t i = start_index; i <= end_index; ++i) {
+            temp_stack.push(container_[i]);
+        }
+        return temp_stack;
+    }
 
-    void resize(size_t new_size);
+    bool empty() const {
+        return container_.empty();
+    }
 
-    void print_stack();
+    void resize(size_t new_size) {
+        if (container_.empty()) {
+            throw std::runtime_error("Stack is empty");
+        }
+        container_.resize(new_size);
+    }
+
+
+    void print_stack() const {
+        for (size_t i = 0; i < container_.size(); ++i) {
+            std::cout << container_[container_.size() - i - 1] << " ";
+        }
+        std::cout << std::endl;
+    }
 };
-
-// ---------------------------------------------------------
-template <typename T>
-T Stack<T>::top() const {
-    if (array.size() == 0) {
-        throw std::runtime_error("Stack is empty");
-    }
-    return array[array.size() - 1];
-}
-
-template <typename T>
-void Stack<T>::pop() {
-    if (array.size() == 0) {
-        throw std::runtime_error("Stack is empty");
-    }
-    array.pop_back();
-}
-
-template <typename T>
-void Stack<T>::push(const T& element) {
-    array.push_back(element);
-}
-
-template <typename T>
-Stack<T> Stack<T>::reverse() {
-    Stack<T> reversed_stack;
-    Stack<T> temp_stack = *this;
-    while (!temp_stack.empty()) {
-        reversed_stack.push(temp_stack.top());
-        temp_stack.pop();
-    }
-    return reversed_stack;
-}
-
-template <typename T>
-size_t Stack<T>::size() const {
-    return array.size();
-}
-
-template <typename T>
-Stack<T> Stack<T>::concat(Stack<T>& other_stack) {
-    if (array.size() == 0) {
-        throw std::runtime_error("Stack is empty");
-    }
-
-    Stack<T> result = *this;
-    while (!other_stack.empty()) {
-        result.push(other_stack.top());
-        other_stack.pop();
-    }
-    return result;
-}
-
-template <typename T>
-Stack<T> Stack<T>::substack(size_t start_index, size_t end_index) {
-    if (end_index > array.size() || start_index > end_index) {
-        throw std::out_of_range("Index out of range");
-    }
-    Stack<T> temp_stack;
-    for (size_t i = start_index; i <= end_index; ++i) {
-        temp_stack.push(array[i]);
-    }
-    return temp_stack;
-}
-
-template <typename T>
-bool Stack<T>::empty() const {
-    return array.size() == 0;
-}
-
-template <typename T>
-Stack<T>& Stack<T>::operator=(const Stack<T>& other_stack) {
-    if (this != &other_stack) {
-        array = other_stack.array;
-    }
-    return *this;
-}
-
-template <typename T>
-void Stack<T>::resize(size_t new_size) {
-    if (array.size() == 0) {
-        throw std::runtime_error("Stack is empty");
-    }
-    array.resize(new_size);
-}
-
-template<typename T>
-void Stack<T>::print_stack() {
-    for (size_t i = 0; i < array.size(); ++i) {
-        std::cout << array[array.size() - i - 1] << " ";
-    }
-    std::cout << std::endl;
-}

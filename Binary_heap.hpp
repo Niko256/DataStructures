@@ -1,7 +1,7 @@
 #pragma once
-#include "Dynamic_Array.hpp"
-#include "stdexcept"
 
+#include "Dynamic_Array.hpp"
+#include <stdexcept>
 
 template <typename T>
 class BinaryHeap {
@@ -10,6 +10,26 @@ private:
 
 public:
     BinaryHeap() = default;
+
+    BinaryHeap(const BinaryHeap& other) : data(other.data) {}
+
+    BinaryHeap(BinaryHeap&& other) noexcept : data(std::move(other.data)) {}
+
+    ~BinaryHeap() = default;
+
+    BinaryHeap& operator=(const BinaryHeap& other) {
+        if (this != &other) {
+            data = other.data;
+        }
+        return *this;
+    }
+
+    BinaryHeap& operator=(BinaryHeap&& other) noexcept {
+        if (this != &other) {
+            data = std::move(other.data);
+        }
+        return *this;
+    }
 
     void sift_down(size_t index);
 
@@ -68,12 +88,12 @@ void BinaryHeap<T>::insert(const T& item) {
 
 template <typename T>
 T BinaryHeap<T>::extract_min() {
-    if (data.size() == 0) {
-        throw std::runtime_error("Queue is empty");
+    if (data.empty()) {
+        throw std::runtime_error("Heap is empty");
     }
     T min_item = data[0];
     data[0] = data[data.size() - 1];
-    data.pop_back()();
+    data.pop_back();
     if (!data.empty()) {
         sift_down(0);
     }
@@ -94,11 +114,13 @@ void BinaryHeap<T>::set_element(size_t index, const T& value) {
         throw std::out_of_range("Index out of range");
     }
     data[index] = value;
+    sift_up(index);
+    sift_down(index);
 }
 
 template <typename T>
 bool BinaryHeap<T>::empty() const {
-    return data.size() == 0;
+    return data.empty();
 }
 
 template <typename T>
