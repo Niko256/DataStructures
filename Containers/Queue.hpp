@@ -63,7 +63,7 @@ public:
         stack_2.pop();
     }
 
-    T front() const {
+    T front() {
         if (stack_1.empty() && stack_2.empty()) {
             throw std::runtime_error("Queue is empty");
         }

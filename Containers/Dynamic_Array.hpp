@@ -49,6 +49,16 @@ public:
         other.capacity_ = 0;
     }
 
+    DynamicArray(size_t n, const T& value, const Allocator& alloc = Allocator()) : allocator_(alloc) {
+        data_ = allocator_.allocate(n);
+        size_ = n;
+        capacity_ = n;
+        for (size_t i = 0; i < n; ++i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, value);
+        }
+    }
+
+
     ~DynamicArray() {
         clear();
         allocator_.deallocate(data_, capacity_);
@@ -126,22 +136,34 @@ public:
         return data_[size_ - 1];
     }
 
-    iterator begin() noexcept {
+    iterator begin() {
+        if (data_ == nullptr) {
+            throw std::runtime_error("DynamicArray is null");
+        }
         return iterator(data_);
     }
 
-    const_iterator cbegin() const noexcept {
+    const_iterator cbegin() const {
+        if (data_ == nullptr) {
+            throw std::runtime_error("DynamicArray is null");
+        }
         return const_iterator(data_);
     }
 
-    iterator end() noexcept {
+    iterator end() {
+        if (data_ == nullptr) {
+            throw std::runtime_error("DynamicArray is null");
+        }
         return iterator(data_ + size_);
     }
 
-    const_iterator cend() const noexcept {
+    const_iterator cend() const {
+        if (data_ == nullptr) {
+            throw std::runtime_error("DynamicArray is null");
+        }
         return const_iterator(data_ + size_);
     }
-
+    
     reverse_iterator rbegin() noexcept {
         return reverse_iterator(end());
     }
