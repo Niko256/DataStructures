@@ -33,12 +33,19 @@ public:
         return *this;
     }
 
-    T top() const {
+    const T& top() const {
         if (container_.empty()) {
             throw std::runtime_error("Stack is empty");
         }
         return container_.back();
     }
+
+    T& top() {
+        if (container_.empty()) throw std::runtime_error("Stack is empty");
+
+        return container_.back();
+    }
+
 
     void pop() {
         if (container_.empty()) {
