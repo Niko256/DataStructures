@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <memory>
 #include <stdexcept>
+#include <utility>
 
 template <typename T, typename Allocator = std::allocator<T>>
 class DynamicArray {
@@ -225,6 +226,22 @@ public:
         }
 
         --size_;
+    }
+
+    void erase(const T& value) {
+        size_t i = 0;
+        while (i < size_) {
+            if (data_[i] == value) {
+                std::allocator_traits<Allocator>::destroy(allocator_, data_ + i);
+                for (size_t j = i; j < size_ - 1; ++j) {
+                    std::allocator_traits<Allocator>::construct(allocator_, data_ + j, std::move(data_[j + 1]));
+                    std::allocator_traits<Allocator>::destroy(allocator_, data_ + j + 1);
+                }
+                --size_;
+            } else {
+                ++i;
+            }
+        }
     }
 
     iterator erase(iterator pos) {
