@@ -1,9 +1,7 @@
 #pragma once
-#include <city.h>
+#include "../../../external/smhasher/src/City.h"
 #include <string>
 #include <type_traits>
-
-// TODO - add all types and add as submodule https://github.com/aappleby/smhasher
 
 template <typename T>
 struct CityHash {
@@ -16,5 +14,6 @@ struct CityHash {
         } else if constexpr (std::is_same_v<T, std::string>) {
             return CityHash64(key.c_str(), key.lenght());
         }
+        return 0;
     }
 };

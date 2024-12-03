@@ -1,10 +1,10 @@
-#include <cstdint>
 #include <functional>
 #include <memory>
 #include "../Pair.hpp"
 #include "../List.hpp"
 #include "../Dynamic_Array.hpp"
-
+#include "Hashers/CityHash.hpp"
+#include "Hashers/MurmurHash.hpp"
 
 template <typename Key,
          typename Value,
@@ -24,10 +24,14 @@ class HashTable {
     KeyEqual equal_; // comparator
     Alloc allocator_;
     DynamicArray<ListIterator> hash_table_;
+    ListType elements_;
 
-    static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.8f;
+    size_t size_;
+    size_t bucket_count_;
+    size_t rehash_threshold_;
 
-    // ...
+    static constexpr float MAX_LOAD_FACTOR = 0.8f;
+    static constexpr size_t MIN_BUCKET_COUNT = 8;
 };
 
 
