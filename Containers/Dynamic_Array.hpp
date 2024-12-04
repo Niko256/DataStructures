@@ -59,7 +59,6 @@ public:
         }
     }
 
-
     ~DynamicArray() {
         clear();
         allocator_.deallocate(data_, capacity_);
