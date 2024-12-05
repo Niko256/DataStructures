@@ -53,7 +53,7 @@ public:
 
         ref operator*() const { return static_cast<Node*>(node_)->data_; }
 
-        pointer operator->() const {return &static_cast<Node*>(node_)->data_; }
+        pointer operator->() const { return &static_cast<Node*>(node_)->data_; }
 
         Iterator& operator++() {
             node_ = node_->next;
