@@ -185,12 +185,15 @@ class HashTable {
 
         size_t bucket_index = hash_(key) % bucket_count_;
 
-        for (auto list_it = elements_.begin(); list_it != elements_.end(); ++list_it) {
-            if (list_it != it && equal_(list_it->first_, key)) {
+        auto bucket_it = hash_table_[bucket_index];
+        while (bucket_it != elements_.end()) {
+            if (equal_(bucket_it->first_, key)) {
                 elements_.erase(it);
-                return {list_it, false};
+                return { bucket_it, false };
             }
+            ++bucket_it;
         }
+
 
         if (size_ + 1 > rehash_threshold_) {
             size_t new_count = bucket_index * 2;
@@ -239,9 +242,9 @@ class HashTable {
     iterator find(const Key& key) {
         size_t bucket_index = hash_(key) % bucket_count_;
 
-        for (auto it = elements_.begin(); it != elements_.end(); ++it) {
-            if (equal_(it->first_, key)) {
-                return it;
+        for (auto bucket_it = hash_table_[bucket_index]; bucket_it != elements_.end(); ++bucket_it) {
+            if (equal_(bucket_it->first_, key)) {
+                return bucket_it;
             }
         }
         return elements_.end();
@@ -267,14 +270,7 @@ class HashTable {
     }
 
     bool contains(const Key& key) const {
-        size_t bucket_index = hash_(key) % bucket_count_;
-
-        for (auto it = elements_.begin(); it != elements_.end(); ++it) {
-            if (equal_(it->first_, key)) {
-                return true;
-            }
-        }
-        return false;
+        return find(key) != elements_.end();
     }
 
 //
@@ -287,11 +283,11 @@ class HashTable {
 
     size_t get_bucket(const Key& key) const noexcept { return hash_(key) % bucket_count_; }
 
-    size_t bucket_size(size_t n) const {
+    size_t bucket_size(size_t hash_index) const {
         size_t count = 0;
 
-        for (auto it = elements_.begin(); it != elements_.end(); ++it) {
-            if (get_bucket(it->first_) == n) {
+        for (auto it = hash_table_[hash_index]; it != elements_.end(); ++it) {
+            if (get_bucket(it->first_) == hash_index) {
                 ++count;
             }
         }
