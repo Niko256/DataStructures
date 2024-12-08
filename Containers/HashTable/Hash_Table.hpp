@@ -28,6 +28,8 @@ class HashTable {
 
         template <typename... Args>
         HashNode(size_t hash, Args&&... args) : cached_hash_(hash), data_(std::forward<Args>(args)...) {}
+
+        Value& get_value() { return data_.second_; }
     };
 
     using BaseNodeType = Pair<const Key, Value>;
