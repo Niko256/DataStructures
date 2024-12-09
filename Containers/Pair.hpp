@@ -14,6 +14,9 @@ public:
 
     Pair(Pair&& other) noexcept : first_(std::move(other.first_)), second_(std::move(other.second_)) {}
 
+    template <typename U, typename V>
+    Pair(U&& f, V&& s) : first_(std::forward<U>(f)), second_(std::forward<V>(s)) {}
+
     Pair& operator=(const Pair& other) {
         if (this != &other) {
             first_ = other.first_;

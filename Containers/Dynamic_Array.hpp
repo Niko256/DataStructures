@@ -3,6 +3,8 @@
 #include "../Iterators/Reverse.hpp"
 #include "../Iterators/Random_Access.hpp"
 #include <cstddef>
+#include <iostream>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <utility>
@@ -27,11 +29,19 @@ public:
     DynamicArray() : data_(nullptr), size_(0), capacity_(0) {}
 
     explicit DynamicArray(size_t n, const Allocator& alloc = Allocator()) : allocator_(alloc) {
-        data_ = allocator_.allocate(n);
-        size_ = n;
-        capacity_ = n;
-        for (size_t i = 0; i < n; ++i) {
-            std::allocator_traits<Allocator>::construct(allocator_, data_ + i);
+        if (n > std::numeric_limits<size_t>::max() / sizeof(T)) {
+            throw std::bad_alloc();
+        }
+        try {
+            data_ = allocator_.allocate(n);
+            size_ = n;
+            capacity_ = n;
+            for (size_t i = 0; i < n; ++i) {
+                std::allocator_traits<Allocator>::construct(allocator_, data_ + i);
+            }
+        }
+        catch (...) {
+            throw std::bad_alloc();
         }
     }
 
