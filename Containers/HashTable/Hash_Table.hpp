@@ -97,6 +97,8 @@ class HashTable {
         }
     }
 
+  public:
+
     void clear() {
         elements_.clear();
         hash_table_ = DynamicArray<ListIterator>(MIN_BUCKET_COUNT, elements_.end());
@@ -104,8 +106,6 @@ class HashTable {
         bucket_count_ = MIN_BUCKET_COUNT;
         rehash_threshold_ = static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR);
     }
-
-  public:
 
 //
     HashTable() : 
