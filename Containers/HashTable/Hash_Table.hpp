@@ -66,12 +66,20 @@ class HashTable {
 
         iterator(typename ListType::iterator it) : it_(it) {}
 
-        HashTableRef operator*() {
+        HashTableRef operator*() && {
             return HashTableRef(it_->data_.first_, it_->data_.second_);
         }
 
-        const HashTableRef operator*() const {
+        const HashTableRef operator*() const && {
             return HashTableRef(it_->data_.first_, it_->data_.second_);
+        }
+
+        HashTableRef& operator*() & {
+            return *reinterpret_cast<HashTableRef*>(&(it_->data_));
+        }
+
+        const HashTable& operator*() const & {
+            return *reinterpret_cast<const HashTableRef*>(&(it_->data_));
         }
 
         iterator& operator++() {
@@ -489,7 +497,7 @@ class HashTable {
         return it.it_->data_.second_;
     }
 
-    Value& at(const Key& key) {
+    Value& at(const Key& key) const {
         auto it = find(key);
 
         if (it == end()) throw std::out_of_range("Key not found");

@@ -101,6 +101,10 @@ public:
         return use_count() == 1;
     }
 
+    bool operator==(const SharedPtr<T>& other) const {
+        return ptr_ == other.ptr_;
+    }
+
     void reset(T* new_ptr = nullptr) {
         if (ptr_ != new_ptr) {
 
