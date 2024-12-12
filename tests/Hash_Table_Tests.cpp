@@ -51,6 +51,15 @@ TEST_F(HashTableTest, CollisionHandling) {
     collision_table.erase(2);
     EXPECT_EQ(collision_table.size(), 2);
     EXPECT_THROW(collision_table.at(2), std::out_of_range);
+
+    HashTable<int, std::string> hash_table;
+    hash_table[1] = "one";
+    hash_table[2] = "two";
+    hash_table[3] = "three";
+
+    for (const auto& [key, value] : hash_table) {
+        std::cout << "Key: " << key << ", Value: " << value << std::endl;
+    }
 }
 
 
