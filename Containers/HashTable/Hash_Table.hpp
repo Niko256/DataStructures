@@ -22,7 +22,7 @@ class HashTable {
   private:
     struct HashNode {
         Pair<const Key, Value> data_;
-        size_t cached_hash_;
+        size_t cached_hash_; // Cached hash value for perfomance
 
         HashNode(size_t hash, Key& k, Value& v) : 
             cached_hash_(hash), data_(k, v) {}
@@ -154,9 +154,9 @@ class HashTable {
     ListType elements_;
     DynamicArray<ListIterator> hash_table_;
 
-    size_t size_;
-    size_t bucket_count_{MIN_BUCKET_COUNT};
-    size_t rehash_threshold_;
+    size_t size_; // Number of elements
+    size_t bucket_count_{MIN_BUCKET_COUNT}; // Number of buckets 
+    size_t rehash_threshold_; // Threshold for rehashing
 
     static constexpr float MAX_LOAD_FACTOR = 0.8f;
     static constexpr size_t MIN_BUCKET_COUNT = 7;
@@ -164,27 +164,36 @@ class HashTable {
 // -----------------------------------------------
 
     void rehash(size_t count) {
+        // Ensure minimum bucket count and proper sizing based on load factor
         count = std::max(count, MIN_BUCKET_COUNT);
         count = std::max(count, static_cast<size_t>(std::ceil(size_ / MAX_LOAD_FACTOR)));
     
+        // Early return if no resizing needed
         if (count == bucket_count_) return;
 
         try {
+            // Create new hash table with desired size, initialized with end iterators
             DynamicArray<ListIterator> new_table(count, elements_.end());
         
+            // Redistribute existing elements into new table
             for (auto it = elements_.begin(); it != elements_.end(); ++it) {
+                // Calculate new index using cached hash value
                 size_t new_index = it->cached_hash_ % count;
 
+                // If bucket is empty (contains end iterator), place element
                 if (new_table[new_index] == elements_.end()) {
                     new_table[new_index] = it;
                 }
             }
 
+            // Move new table into place
             hash_table_ = std::move(new_table);
             bucket_count_ = count;
+            // Recalculate rehashing threshold
             rehash_threshold_ = static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR);
 
         } catch(const std::bad_alloc& e) {
+            // Propagate memory allocation failures
             throw;
         }
     }
@@ -329,18 +338,27 @@ class HashTable {
     template <typename... Args>
     Pair<iterator, bool> emplace(Args&&... args) {
         try {
+            
+            // Create a temporary pair from forwarded arguments
             BaseNodeType tmp_pair(std::forward<Args>(args)...); 
+            
+            // Calculate hash value for the key
             const size_t hash_value = hash_(tmp_pair.first_);
+            
+            // Determine bucket index using modulo
             size_t bucket_index = hash_value % bucket_count_;
 
+            // Check if key already exists in the bucket
             auto current = hash_table_[bucket_index];
+
             while (current != elements_.end() && current->cached_hash_ % bucket_count_ == bucket_index) {
                 if (equal_(current->data_.first_, tmp_pair.first_)) {
-                    return {iterator(current), false};  
+                    return {iterator(current), false};  // Key exists, return false
                 }
                 ++current;
             }
 
+            // Check if rehashing is needed (load factor exceeded)
             if (size_ + 1 > rehash_threshold_) {
                 try {
                     size_t new_count = next_prime(bucket_count_ * 2);
@@ -348,27 +366,32 @@ class HashTable {
                     bucket_index = hash_value % bucket_count_;
                 }
                 catch (const std::bad_alloc& e) {
-                    if (size_ >= bucket_count_) throw; 
+                    if (size_ >= bucket_count_) throw; // Rethrow if critical
                 }
             }
 
+            // Create new node with the hash value and moved data
             HashNode node(hash_value, 
-                     std::move(const_cast<Key&>(tmp_pair.first_)), 
-                     std::move(tmp_pair.second_));
+                         std::move(const_cast<Key&>(tmp_pair.first_)), 
+                         std::move(tmp_pair.second_));
 
+            // Find insertion position in the bucket
             auto inserted_position = hash_table_[bucket_index];
             while (inserted_position != elements_.end() && inserted_position->cached_hash_ % bucket_count_ == bucket_index) {
                 ++inserted_position;
             }
 
+            // Insert the node into the list
             auto inserted_it = elements_.emplace(inserted_position, std::move(node));
         
+            // Update bucket head if needed
             if (hash_table_[bucket_index] == elements_.end()) {
                 hash_table_[bucket_index] = inserted_it;
             }
 
             ++size_;
-            return {iterator(inserted_it), true};
+            return {iterator(inserted_it), true}; // Successfully inserted
+
         }
         catch (const std::bad_alloc& e) {
             std::cout << "Bad alloc caught at: " << __LINE__ << std::endl;
