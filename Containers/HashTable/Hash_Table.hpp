@@ -142,6 +142,7 @@ class HashTable {
         const HashNode* operator->() const {
             return &(*it_);
         }
+
     };
 
   private:
@@ -321,11 +322,11 @@ class HashTable {
     }
 
     void insert(const HashNode& node) {
-        auto [it, inserted] = emplace(node); 
+        auto [it, inserted] = emplace(node.get_key(), node.get_value()); 
     }
 
     void insert(HashNode&& node) {
-        auto [it, inserted] = emplace(std::move(node));
+        auto [it, inserted] = emplace(std::move(const_cast<Key&>(node.get_key())), std::move(node.get_value()));
     }
 
     template <typename InputIt>
