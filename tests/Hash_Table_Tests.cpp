@@ -283,3 +283,26 @@ TEST_F(HashTableTest, MoveConstructor) {
     EXPECT_EQ(moved_table.at(1), "one");
     EXPECT_TRUE(table.empty());
 }
+
+
+
+TEST_F(HashTableTest, RehashStress) {
+    const size_t iterations = 1000;
+    std::unordered_map<int, std::string> reference;
+
+    for (size_t i = 0; i < iterations; ++i) {
+        int key = static_cast<int>(i);
+        std::string value = std::to_string(i);
+        table.emplace(key, value);
+        reference[key] = value;
+
+        if (i % 100 == 0) {
+            table.rehash(table.bucket_count() + 1);
+            for (const auto& [k, v] : reference) {
+                auto it = table.find(k);
+                ASSERT_NE(it, table.end());
+                EXPECT_EQ(it->data_.second_, v);
+            }
+        }
+    }
+}

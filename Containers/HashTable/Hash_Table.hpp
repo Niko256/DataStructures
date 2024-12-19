@@ -40,7 +40,7 @@ class HashTable {
         HashNode(HashNode&& other) noexcept : cached_hash_(other.cached_hash_), data_(std::move(other.data_)) {}
     };
 
-    
+  public:    
     struct HashTableRef {
         const Key& first;
         Value& second;
@@ -66,12 +66,12 @@ class HashTable {
 
         iterator(typename ListType::iterator it) : it_(it) {}
 
-        HashTableRef operator*() {
+        HashTableRef operator*() const {
             return HashTableRef(it_->data_.first_, it_->data_.second_);
         }
 
-        const HashTableRef operator*() const {
-            return HashTableRef(it_->data_.first_, it_->data_.second_);
+        HashTableRef* operator->() const {
+            return new HashTableRef(it_->data_.first_, it_->data_.second_);
         }
 
         iterator& operator++() {
@@ -94,10 +94,6 @@ class HashTable {
         }
 
         HashNode* operator->() {
-            return &(*it_);
-        }
-
-        const HashNode* operator->() const {
             return &(*it_);
         }
 
@@ -162,6 +158,8 @@ class HashTable {
     static constexpr float MAX_LOAD_FACTOR = 0.8f;
     static constexpr size_t MIN_BUCKET_COUNT = 7;
 
+  public:
+
 // -----------------------------------------------
 
     void rehash(size_t count) {
@@ -199,7 +197,6 @@ class HashTable {
         }
     }
 
-  public:
 
     void clear() {
         elements_.clear();
@@ -500,6 +497,23 @@ class HashTable {
 
     bool contains(const Key& key) const {
         return find(key) != end();
+    }
+
+    iterator begin(size_t n) {
+        return iterator(hash_table_[n]);
+    }
+
+    iterator end(size_t n) {
+        auto next_bucket = n + 1;
+        while (next_bucket < bucket_count_ && hash_table_[next_bucket] == elements_.end()) {
+            ++next_bucket;
+        }
+        return iterator(next_bucket < bucket_count_ ? hash_table_[next_bucket] : elements_.end());
+    }
+
+    size_t bucket(const Key& key) const {
+        if (empty()) throw std::out_of_range("Empty hash table");
+        return hash_(key) % bucket_count_;
     }
 
     float load_factor() const noexcept { return static_cast<float>(size_) / bucket_count_; }

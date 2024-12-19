@@ -26,6 +26,9 @@ private:
         T data_;
 
         Node() = default;
+        
+        template <typename... Args>
+        Node(Args&&... args) : data_(std::forward<Args>(args)...) {}
         Node(const T& value) : data_(value) {}
         Node(T&& value) : data_(std::move(value)) {}
     };
@@ -38,15 +41,16 @@ private:
     using NodeAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<Node>;
     NodeAllocator node_allocator_;
 
-public:
+  public:
     using allocator_type = Allocator;
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
     
-template <bool is_const>
+    template <bool is_const>
     class Iterator {
       private:
         BaseNode* node_;
+        bool is_valid_ = true;
 
       public:
         using value_type = std::conditional_t<is_const, const T, T>;
@@ -59,30 +63,55 @@ template <bool is_const>
 
         Iterator(BaseNode* node) : node_(node) {}
 
-        reference operator*() const { return static_cast<Node*>(node_)->data_; }
+        reference operator*() const { 
+            if (!is_valid_) {
+                throw std::runtime_error("Attempting to dereference invalid iterator");
+            }
+            return static_cast<Node*>(node_)->data_; 
+        }
 
-        pointer operator->() const { return &static_cast<Node*>(node_)->data_; }
+        pointer operator->() const { 
+            if (!is_valid_) {
+                throw std::runtime_error("Attempting to dereference invalid iterator");
+            }
+            return &static_cast<Node*>(node_)->data_; 
+        }
 
         Iterator& operator++() {
+            if (!is_valid_) {
+                throw std::runtime_error("Attempting to increment invalid iterator");
+            }
             node_ = node_->next;
             return *this;
         }
 
         Iterator operator++(int) {
-            Iterator tmp = *this;
-            node_ = node_->next;
-            return tmp;
+            if (!is_valid_) {
+                throw std::runtime_error("Attempting to increment invalid iterator");
+            } else {
+                Iterator tmp = *this;
+                node_ = node_->next;
+                return tmp;
+            }
         }
 
         Iterator& operator--() {
-            node_ = node_->prev;
-            return *(this);
+            if (!is_valid_) {
+                throw std::runtime_error("Attempting to decrement invalid iterator");
+            } else {
+                node_ = node_->prev;
+                return *(this);
+            }
         }
 
         Iterator operator--(int) {
-            Iterator tmp = *this;
-            node_ = node_->prev;
-            return tmp;
+            if (!is_valid_) {
+                throw std::runtime_error("Attempting to decrement invalid iterator");
+            } else {
+                Iterator tmp = *this;
+                node_ = node_->prev;
+                return tmp;
+            }
         }
 
         bool operator==(const Iterator& other) const {
@@ -96,6 +125,8 @@ template <bool is_const>
         operator Iterator<true>() const { return Iterator<true>(node_); }
 
         BaseNode* get_node() const { return node_; }
+
+        void invalidate() { is_valid_ = false; }
     
         friend class List;
     };
@@ -117,6 +148,7 @@ template <bool is_const>
 
     List() : size_(0) {
         head_ = new BaseNode();
+        tail_ = head_;
     }
 
     // invoke constructor by default firstly and then copy all elements
@@ -127,11 +159,13 @@ template <bool is_const>
     }
 
     List(List&& other) noexcept : 
-        head_(other.head_), tail_(other.tail_), size_(other.size_),
-        allocator_(std::move(other.allocator_)), node_allocator_(std::move(other.node_allocator_)) {
-
+        head_(other.head_),
+        tail_(other.tail_),
+        size_(other.size_),
+        allocator_(std::move(other.allocator_)),
+        node_allocator_(std::move(other.node_allocator_)) {
         other.head_ = new BaseNode();
-        other.tail_ = nullptr;
+        other.tail_ = other.head_;
         other.size_ = 0;
     }
 
@@ -151,13 +185,18 @@ template <bool is_const>
     }
 
     List& operator=(List&& other) noexcept {
-        if (*this != other) {
+        if (this != &other) {
             clear();
+            delete head_;
+            
             head_ = other.head_;
             tail_ = other.tail_;
             size_ = other.size_;
+            allocator_ = std::move(other.allocator_);
+            node_allocator_ = std::move(other.node_allocator_);
 
-            other.head_ = other.tail_ = nullptr;
+            other.head_ = new BaseNode();
+            other.tail_ = other.head_;
             other.size_ = 0;
         }
         return *this;
@@ -170,7 +209,7 @@ template <bool is_const>
         auto it_2 = other.begin();
 
         while(it_1 != end()) {
-            if (it_1->data_ != it_2->data_) return true;
+            if (*it_1 != *it_2) return true;
             ++it_1;
             ++it_2;
         }
@@ -204,7 +243,9 @@ template <bool is_const>
 
     void clear() noexcept {
         while (!empty()) {
-            pop_front();
+            auto it = begin();
+            it.invalidate();
+            erase(it);
         }
 
         head_->next = head_;
@@ -255,6 +296,8 @@ template <bool is_const>
         node->prev->next = node->next;
         node->next->prev = node->prev;
 
+        position.invalidate();
+
         std::allocator_traits<NodeAllocator>::destroy(node_allocator_, static_cast<Node*>(node));
         node_allocator_.deallocate(static_cast<Node*>(node), 1);
         --size_;
@@ -274,6 +317,8 @@ template <bool is_const>
 
             position.node_->prev->next = new_node;
             position.node_->prev = new_node;
+
+            position.invalidate();
 
             ++size_;
             return iterator(new_node);
