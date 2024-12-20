@@ -401,6 +401,16 @@ class HashTable {
         }
     }
 
+    template <typename... Args>
+    Pair<iterator, bool> try_emplace(const Key& key, Args&&... args) {
+        auto it = find(key);
+        if (it != end()) {
+            return {it, false};
+        }
+        return emplace(key, std::forward<Args>(args)...);
+    }
+
+
     void erase(iterator position) {
         if (position == end()) {
             return;
@@ -438,6 +448,22 @@ class HashTable {
             erase(current);
         }
     }
+
+    template <typename Predicate>
+    size_t erase_if(Predicate pred) {
+        size_t count = 0;
+
+        for (auto it = begin(); it != end();) {
+            if (pred(*it)) {
+                it = erase(it);
+                ++count;
+            } else {
+                ++it;
+            }
+        }
+        return count;
+    }
+
 
     iterator find(const Key& key) {
         const size_t hash_value = hash_(key);
@@ -539,7 +565,19 @@ class HashTable {
             ++it;
         }
         return count;
-    } 
+    }
+
+    Hash hash_function() const {
+        return hash_;
+    }
+
+    KeyEqual key_eq() const {
+        return equal_;
+    }
+
+    Allocator get_allocator() const {
+        return allocator_;
+    }
 
     bool empty() const noexcept { return size_ == 0; }
 

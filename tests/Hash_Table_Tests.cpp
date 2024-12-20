@@ -306,3 +306,230 @@ TEST_F(HashTableTest, RehashStress) {
         }
     }
 }
+
+
+
+TEST_F(HashTableTest, CopyConstructor) {
+    table.emplace(1, "one");
+    table.emplace(2, "two");
+    
+    HashTable<int, std::string> copied_table(table);
+    
+    EXPECT_EQ(copied_table.size(), table.size());
+    EXPECT_EQ(copied_table.at(1), table.at(1));
+    EXPECT_EQ(copied_table.at(2), table.at(2));
+    
+    copied_table[1] = "modified";
+    EXPECT_EQ(table.at(1), "one");
+}
+
+TEST_F(HashTableTest, MoveAssignment) {
+    table.emplace(1, "one");
+    HashTable<int, std::string> other_table;
+    other_table = std::move(table);
+    
+    EXPECT_EQ(other_table.at(1), "one");
+    EXPECT_TRUE(table.empty());
+}
+
+TEST_F(HashTableTest, EraseRange) {
+    for(int i = 0; i < 10; ++i) {
+        table.emplace(i, std::to_string(i));
+    }
+    
+    auto start = table.find(3);
+    auto end = table.find(7);
+    table.erase(start, end);
+    
+    EXPECT_FALSE(table.contains(3));
+    EXPECT_FALSE(table.contains(4));
+    EXPECT_FALSE(table.contains(5));
+    EXPECT_FALSE(table.contains(6));
+    EXPECT_TRUE(table.contains(7));
+}
+
+TEST_F(HashTableTest, SearchPerformance) {
+    const int NUM_ELEMENTS = 100000;
+    std::vector<int> keys;
+    
+    for(int i = 0; i < NUM_ELEMENTS; ++i) {
+        keys.push_back(i);
+        table.emplace(i, std::to_string(i));
+    }
+    
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(keys.begin(), keys.end(), g);
+    
+    auto start = std::chrono::high_resolution_clock::now();
+    for(int key : keys) {
+        auto it = table.find(key);
+        EXPECT_NE(it, table.end());
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    
+    std::cout << "Search of " << NUM_ELEMENTS << " elements took: " 
+              << duration.count() << "ms" << std::endl;
+}
+
+
+TEST_F(HashTableTest, LargeScaleTest) {
+    const int NUM_ELEMENTS = 1000000;
+
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        table.emplace(i, std::to_string(i));
+    }
+
+    EXPECT_EQ(table.size(), NUM_ELEMENTS);
+    EXPECT_LE(table.load_factor(), table.max_load_factor());
+
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        EXPECT_EQ(table.at(i), std::to_string(i));
+    }
+}
+
+TEST_F(HashTableTest, DuplicateInsertion) {
+    table.emplace(1, "one");
+    table.emplace(1, "another one");
+
+    EXPECT_EQ(table.size(), 1);
+    EXPECT_EQ(table.at(1), "one");
+}
+
+
+TEST_F(HashTableTest, ClearTable) {
+    for (int i = 0; i < 10; ++i) {
+        table.emplace(i, std::to_string(i));
+    }
+
+    EXPECT_EQ(table.size(), 10);
+
+    table.clear();
+    EXPECT_EQ(table.size(), 0);
+    EXPECT_TRUE(table.empty());
+}
+
+
+TEST_F(HashTableTest, RehashWithLargeBucketCount) {
+    table.rehash(10000);
+
+    EXPECT_GE(table.bucket_count(), 10000);
+
+    for (int i = 0; i < 1000; ++i) {
+        table.emplace(i, std::to_string(i));
+    }
+
+    EXPECT_LE(table.load_factor(), table.max_load_factor());
+}
+
+
+TEST_F(HashTableTest, EmptyIterator) {
+    EXPECT_EQ(table.begin(), table.end());
+}
+
+
+TEST_F(HashTableTest, ModifyValueWithBrackets) {
+    table[1] = "one";
+    table[1] = "new one";
+
+    EXPECT_EQ(table[1], "new one");
+}
+
+
+
+TEST_F(HashTableTest, CompareWithStdUnorderedMap) {
+    const int NUM_ELEMENTS = 100000;
+
+    std::unordered_map<int, std::string> std_map;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        std_map.emplace(i, std::to_string(i));
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto std_duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < NUM_ELEMENTS; ++i) {
+        table.emplace(i, std::to_string(i));
+    }
+    end = std::chrono::high_resolution_clock::now();
+    auto custom_duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "std::unordered_map insertion time: " << std_duration.count() << "ms" << std::endl;
+    std::cout << "Custom hash table insertion time: " << custom_duration.count() << "ms" << std::endl;
+}
+
+
+
+struct CustomKey {
+    int id;
+    std::string name;
+
+    bool operator==(const CustomKey& other) const {
+        return id == other.id && name == other.name;
+    }
+};
+
+struct CustomKeyHash {
+    size_t operator()(const CustomKey& key) const {
+        return std::hash<int>{}(key.id) ^ std::hash<std::string>{}(key.name);
+    }
+};
+
+TEST_F(HashTableTest, CustomKeyType) {
+    HashTable<CustomKey, std::string, CustomKeyHash> custom_table;
+
+    CustomKey key1{1, "one"};
+    CustomKey key2{2, "two"};
+
+    custom_table.emplace(key1, "value1");
+    custom_table.emplace(key2, "value2");
+
+    EXPECT_EQ(custom_table.at(key1), "value1");
+    EXPECT_EQ(custom_table.at(key2), "value2");
+}
+
+
+TEST_F(HashTableTest, HashDistributionTest) {
+    const int NUM_KEYS = 100;
+
+    HashTable<int, std::string, CityHash<int>> hash_table;
+
+    for (int i = 0; i < NUM_KEYS; ++i) {
+        hash_table.emplace(i, "value" + std::to_string(i));
+    }
+
+    std::cout << "Hash values for keys:" << std::endl;
+    for (int i = 0; i < NUM_KEYS; ++i) {
+        size_t hash_value = hash_table.hash_function()(i);  
+        std::cout << "Key: " << i << ", Hash: " << hash_value << std::endl;
+    }
+
+    std::unordered_map<size_t, int> bucket_counts;  
+    for (int i = 0; i < NUM_KEYS; ++i) {
+        size_t bucket_index = hash_table.bucket(i);  
+        bucket_counts[bucket_index]++;
+    }
+
+    std::cout << "Bucket distribution:" << std::endl;
+    for (const auto& [bucket, count] : bucket_counts) {
+        std::cout << "Bucket " << bucket << ": " << count << " keys" << std::endl;
+    }
+
+    int total_buckets = hash_table.bucket_count();
+    double average_keys_per_bucket = static_cast<double>(NUM_KEYS) / total_buckets;
+    double variance = 0.0;
+
+    for (const auto& [bucket, count] : bucket_counts) {
+        double diff = count - average_keys_per_bucket;
+        variance += diff * diff;
+    }
+    variance /= total_buckets;
+
+    std::cout << "Average keys per bucket: " << average_keys_per_bucket << std::endl;
+    std::cout << "Variance: " << variance << std::endl;
+
+    EXPECT_LT(variance, average_keys_per_bucket * average_keys_per_bucket * 4);  
+}
