@@ -4,6 +4,7 @@
 #include "../Iterators/Random_Access.hpp"
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -213,6 +214,63 @@ public:
         }
         std::allocator_traits<Allocator>::construct(allocator_, data_ + size_, std::forward<Args>(args)...);
         ++size_;
+    }
+
+
+    template <typename U>
+    void insert(size_t index, U&& value) {
+        if (index >= size_) {
+            throw std::out_of_range("Index out of range (insert)");
+        }
+
+        if (size_ == capacity_) {
+            reserve(capacity_ == 0 ? 1 : capacity_ * 2);
+        }
+
+        for (size_t i = size_; i > index; --i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i - 1]));
+            std::allocator_traits<Allocator>::destroy(allocator_, data_ + i - 1);
+        }
+
+        std::allocator_traits<Allocator>::construct(allocator_, data_ + index, std::forward<U>(value));
+        ++size_;
+    }
+
+
+    template <typename U>
+    iterator insert(iterator pos, U&& value) {
+        size_t index = pos - begin();  
+        insert(index, std::forward<U>(value));
+        return begin() + index;
+    }
+
+
+    template <typename InputIt>
+    void insert(size_t index, InputIt first, InputIt last) {
+        if (index >= last) {
+            throw std::out_of_range("Index out of range");
+        }
+
+        size_t count = std::distance(first, last);
+
+        if (size_ + count > capacity_) {
+            reserve(std::max(capacity_ * 2, size_ + count));
+        }
+
+        for (size_t i =  size_ + count - 1; i >= index + count; --i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i - count]));
+            std::allocator_traits<Allocator>::destroy(allocator_, data_ + i - count);
+        }
+
+        for (size_t i = size_; i < count; ++i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + index + i, *first++);
+        }
+
+        size_ += count;
+    }
+    
+    void insert(size_t index, std::initializer_list<T> ilist) {
+        insert(index, ilist.begin(), ilist.end());
     }
 
     void pop_back() {
