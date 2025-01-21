@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Categories.hpp"
+#include <iterator>
 
 template <typename T>
 class BidirectionalIterator {
@@ -8,7 +8,7 @@ private:
     T* current_;
 
 public:
-    using iterator_category = BidirectionalIteratorTag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using pointer = T*;
     using reference = T&;
 

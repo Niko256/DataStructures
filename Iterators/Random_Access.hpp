@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Categories.hpp" 
 #include <cstddef>
+#include <iterator>
 
 template <typename T>
 class RandomAccessIterator {
@@ -9,7 +9,7 @@ private:
     T* current_;
 
 public:
-    using iterator_category = RandomAccessIteratorTag;
+    using iterator_category = std::random_access_iterator_tag;
     using value_type = T;
     using pointer = T*;
     using reference = T&;

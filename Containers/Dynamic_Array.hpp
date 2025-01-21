@@ -3,6 +3,7 @@
 #include "../Iterators/Reverse.hpp"
 #include "../Iterators/Random_Access.hpp"
 #include <cstddef>
+#include <initializer_list>
 #include <iostream>
 #include <iterator>
 #include <limits>
@@ -107,6 +108,36 @@ public:
             other.capacity_ = 0;
         }
         return *this;
+    }
+
+    void assign(size_t n, const T& value) {
+        if (n > capacity_) {
+            reserve(n);
+        }
+
+        for (size_t i = 0; i < n; ++i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, value);
+        }
+        size_ = n;
+    }
+
+    template <typename InputIt>
+    void assign(InputIt first, InputIt last) {
+        clear();
+        size_t count = std::distance(first, last);
+        
+        if (count > capacity_) {
+            reserve(count);
+        }
+
+        for (size_t i = 0; first != last; ++first, ++i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, *first);
+        }
+        size_ = count;
+    }
+
+    void assign(std::initializer_list<T> ilist) {
+        assign(ilist.begin(), ilist.end());
     }
 
     T& operator[](size_t index) {
