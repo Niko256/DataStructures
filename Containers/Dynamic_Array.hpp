@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../Iterators/Reverse.hpp"
-#include "../Iterators/Random_Access.hpp"
 #include <cstddef>
 #include <initializer_list>
 #include <iostream>
@@ -21,12 +19,15 @@ private:
 
 public:
     using allocator_type = Allocator;
+    using value_type = T;
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
-    using iterator = RandomAccessIterator<T>;
-    using const_iterator = ConstRandomAccessIterator<T>;
-    using reverse_iterator = ReverseRandomAccessIterator<iterator>;
-    using const_reverse_iterator = ReverseRandomAccessIterator<const_iterator>;
+    using reference = T&;
+    using const_reference = const T&;
+    using iterator = T*;
+    using const_iterator = const T*;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     DynamicArray() : data_(nullptr), size_(0), capacity_(0) {}
 
@@ -178,32 +179,20 @@ public:
         return data_[size_ - 1];
     }
 
-    iterator begin() {
-        if (data_ == nullptr) {
-            throw std::runtime_error("DynamicArray is null");
-        }
-        return iterator(data_);
+    iterator begin() noexcept {
+        return data_;
     }
 
-    const_iterator cbegin() const {
-        if (data_ == nullptr) {
-            throw std::runtime_error("DynamicArray is null");
-        }
-        return const_iterator(data_);
+    const_iterator cbegin() const noexcept {
+        return data_;
     }
 
-    iterator end() {
-        if (data_ == nullptr) {
-            throw std::runtime_error("DynamicArray is null");
-        }
-        return iterator(data_ + size_);
+    iterator end() noexcept {
+        return data_ + size_;
     }
 
-    const_iterator cend() const {
-        if (data_ == nullptr) {
-            throw std::runtime_error("DynamicArray is null");
-        }
-        return const_iterator(data_ + size_);
+    const_iterator cend() const noexcept {
+        return data_ + size_;
     }
     
     reverse_iterator rbegin() noexcept {
@@ -211,7 +200,7 @@ public:
     }
 
     const_reverse_iterator crbegin() const noexcept {
-        return const_reverse_iterator(end());
+        return const_reverse_iterator(cend());
     }
 
     reverse_iterator rend() noexcept {
@@ -219,7 +208,7 @@ public:
     }
 
     const_reverse_iterator crend() const noexcept {
-        return const_reverse_iterator(begin());
+        return const_reverse_iterator(cbegin());
     }
 
     void push_back(const T& value) {
@@ -247,10 +236,9 @@ public:
         ++size_;
     }
 
-
     template <typename U>
     void insert(size_t index, U&& value) {
-        if (index >= size_) {
+        if (index > size_) {
             throw std::out_of_range("Index out of range (insert)");
         }
 
@@ -267,7 +255,6 @@ public:
         ++size_;
     }
 
-
     template <typename U>
     iterator insert(iterator pos, U&& value) {
         size_t index = pos - begin();  
@@ -275,10 +262,9 @@ public:
         return begin() + index;
     }
 
-
     template <typename InputIt>
     void insert(size_t index, InputIt first, InputIt last) {
-        if (index >= last) {
+        if (index > size_) {
             throw std::out_of_range("Index out of range");
         }
 
@@ -288,13 +274,13 @@ public:
             reserve(std::max(capacity_ * 2, size_ + count));
         }
 
-        for (size_t i =  size_ + count - 1; i >= index + count; --i) {
+        for (size_t i = size_ + count - 1; i >= index + count; --i) {
             std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i - count]));
             std::allocator_traits<Allocator>::destroy(allocator_, data_ + i - count);
         }
 
-        for (size_t i = size_; i < count; ++i) {
-            std::allocator_traits<Allocator>::construct(allocator_, data_ + index + i, *first++);
+        for (size_t i = 0; i < count; ++i, ++first) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + index + i, *first);
         }
 
         size_ += count;
