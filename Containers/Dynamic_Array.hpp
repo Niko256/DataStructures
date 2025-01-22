@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <initializer_list>
 #include <iostream>
@@ -30,6 +31,11 @@ public:
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     DynamicArray() : data_(nullptr), size_(0), capacity_(0) {}
+
+    template <typename Y>
+    DynamicArray(Y&& value) : data_(nullptr), size_(0), capacity_(0) {
+        push_back(std::forward<Y>(value));
+    }
 
     explicit DynamicArray(size_t n, const Allocator& alloc = Allocator()) : allocator_(alloc) {
         if (n > std::numeric_limits<size_t>::max() / sizeof(T)) {
@@ -284,6 +290,32 @@ public:
         }
 
         size_ += count;
+    }
+
+
+    template <typename InputIt>
+    iterator insert(iterator position, InputIt first, InputIt last) {
+        size_t index = position - begin();
+        size_t count = std::distance(first, last);
+
+        if (size_ + count > capacity_) {
+            reserve(std::max(capacity_ * 2, size_ + count));
+        }
+
+        for (size_t i = size_ + count - 1; i >= index + count && i < size_ + count; --i) {
+            
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i - count]));
+
+            std::allocator_traits<Allocator>::destroy(allocator_, data_ + i - count);
+        }
+
+        size_t i = index;
+        for (; first != last; ++first, ++i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, *first);
+        }
+
+        size_ += count;
+        return begin() + index;
     }
     
     void insert(size_t index, std::initializer_list<T> ilist) {
