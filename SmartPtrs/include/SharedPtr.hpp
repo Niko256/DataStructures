@@ -18,7 +18,9 @@ public:
     constexpr SharedPtr() noexcept : ptr_(nullptr), ref_counter_(new ControlBlock(false)) {}
     
     explicit SharedPtr(T* ptr) : ptr_(ptr), ref_counter_(new ControlBlock(true)) {}
-    
+   
+    constexpr SharedPtr(std::nullptr_t) noexcept : ptr_(nullptr), ref_counter_(new ControlBlock(false)) {}
+
     SharedPtr(T* ptr, ControlBlock* rc) : ptr_(ptr), ref_counter_(std::move(rc)) {
         if (ref_counter_) {
             ref_counter_->IncrementShared();
@@ -105,6 +107,15 @@ public:
         return ptr_ == other.ptr_;
     }
 
+    
+    bool operator==(std::nullptr_t) const noexcept {
+        return ptr_ == nullptr;
+    }
+
+    bool operator!=(std::nullptr_t) const noexcept {
+        return ptr_ != nullptr;
+    }
+
     void reset(T* new_ptr = nullptr) {
         if (ptr_ != new_ptr) {
 
@@ -138,3 +149,20 @@ private:
 
     friend class WeakPtr<T>;
 };
+
+
+template<typename T, typename... Args>
+SharedPtr<T> make_shared(Args&&... args) {
+    return SharedPtr<T>(new T(std::forward<Args>(args)...));
+}
+
+
+template <typename T>
+bool operator==(std::nullptr_t, const SharedPtr<T>& ptr) noexcept {
+    return ptr == nullptr;
+}
+
+template <typename T>
+bool operator!=(std::nullptr_t, const SharedPtr<T>& ptr) noexcept {
+    return ptr != nullptr;
+}
