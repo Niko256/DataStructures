@@ -333,18 +333,7 @@ public:
     }
 
     void erase(size_t index) {
-        if (index >= size_) {
-            throw std::out_of_range("Index out of range");
-        }
-
-        std::allocator_traits<Allocator>::destroy(allocator_, data_ + index);
-
-        for (size_t i = index; i < size_ - 1; ++i) {
-            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i + 1]));
-            std::allocator_traits<Allocator>::destroy(allocator_, data_ + i + 1);
-        }
-
-        --size_;
+        erase_at_index(index);
     }
 
     void erase(const T& value) {
@@ -365,7 +354,7 @@ public:
 
     iterator erase(iterator pos) {
         const size_t index = static_cast<size_t>(pos - begin());
-        erase(index);
+        erase_at_index(index);
         return begin() + index;
     }
 
