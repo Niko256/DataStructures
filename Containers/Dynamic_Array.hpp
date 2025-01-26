@@ -12,13 +12,15 @@
 
 template <typename T, typename Allocator = std::allocator<T>>
 class DynamicArray {
-private:
+  private:
+
     T* data_;
     size_t size_;
     size_t capacity_;
     Allocator allocator_;
 
-public:
+  public:
+  
     using allocator_type = Allocator;
     using value_type = T;
     using pointer = typename std::allocator_traits<Allocator>::pointer;
