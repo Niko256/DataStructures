@@ -369,6 +369,22 @@ public:
         return begin() + index;
     }
 
+
+    void erase_at_index(size_t index) {
+        if (index >= size_) {
+            throw std::out_of_range("Index out of range");
+        }
+
+        std::allocator_traits<Allocator>::destroy(allocator_, data_ + index);
+
+        for (size_t i = index; i < size_ - 1; ++i) {
+            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i + 1]));
+            std::allocator_traits<Allocator>::destroy(allocator_, data_ + i + 1);
+        }
+
+        --size_;
+    }
+
     void reserve(size_t new_capacity) {
         if (new_capacity > capacity_) {
             T* new_data = allocator_.allocate(new_capacity);
