@@ -364,7 +364,7 @@ public:
     }
 
     iterator erase(iterator pos) {
-        size_t index = pos - begin();
+        const size_t index = static_cast<size_t>(pos - begin());
         erase(index);
         return begin() + index;
     }
