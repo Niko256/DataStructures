@@ -32,9 +32,12 @@ public:
 
     DynamicArray() : data_(nullptr), size_(0), capacity_(0) {}
 
-    template <typename Y>
-    DynamicArray(Y&& value) : data_(nullptr), size_(0), capacity_(0) {
-        push_back(std::forward<Y>(value));
+    template<typename U>
+    DynamicArray(const DynamicArray<U>& other) : data_(nullptr), size_(0), capacity_(0) {
+        reserve(other.size());
+        for (const auto& item : other) {
+            push_back(T(item));
+        }
     }
 
     explicit DynamicArray(size_t n, const Allocator& alloc = Allocator()) : allocator_(alloc) {
