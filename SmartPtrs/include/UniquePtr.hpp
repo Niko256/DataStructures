@@ -40,6 +40,8 @@ public:
     }
     
     const T* operator->() const noexcept { return ptr_; }
+
+    T* operator->() noexcept { return ptr_; }
     
     const T* get() const { return ptr_; }
 
