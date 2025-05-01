@@ -1,5 +1,5 @@
 #pragma once
-#include "Dynamic_Array.hpp"
+#include "DynamicArray.hpp"
 #include <functional>
 #include <type_traits>
 

@@ -9,7 +9,7 @@
 #include <utility>
 #include "../Pair.hpp"
 #include "../List.hpp"
-#include "../Dynamic_Array.hpp"
+#include "../DynamicArray.hpp"
 #include "Hashers/CityHash.hpp"
 #include "Hashers/MurmurHash.hpp"
 

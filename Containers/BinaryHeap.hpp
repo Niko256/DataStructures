@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Dynamic_Array.hpp"
+#include "DynamicArray.hpp"
 #include <stdexcept>
 
 template <typename T>

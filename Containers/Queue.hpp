@@ -6,7 +6,7 @@
 
 template <typename T>
 class Queue {
-private:
+  private:
     Stack<T> input_stack;   
     Stack<T> output_stack;  
 
@@ -19,7 +19,7 @@ private:
         }
     }
 
-public:
+  public:
     Queue() = default;
     ~Queue() = default;
 

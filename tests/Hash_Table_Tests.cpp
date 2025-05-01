@@ -2,7 +2,7 @@
 #include <chrono>
 #include <random>
 #include <string>
-#include "../Containers/HashTable/Hash_Table.hpp"
+#include "../Containers/HashTable/HashTable.hpp"
 #include "../Containers/HashTable/Hashers/CityHash.hpp"
 #include "../Containers/HashTable/Hashers/MurmurHash.hpp"
 

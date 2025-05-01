@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Dynamic_Array.hpp"
+#include "DynamicArray.hpp"
 #include <stdexcept>
 #include <iostream>
 
 template <typename T>
 class Stack {
-private:
+  private:
     DynamicArray<T> container_;
 
-public:
+  public:
     Stack() = default;
     ~Stack() = default;
 

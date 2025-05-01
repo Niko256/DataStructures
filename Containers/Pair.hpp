@@ -3,7 +3,7 @@
 
 template <typename T1, typename T2>
 class Pair {
-public:
+  public:
     T1 first_;
     T2 second_;
 
