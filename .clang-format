@@ -1,0 +1,14 @@
+BasedOnStyle: LLVM
+Language: Cpp
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+PointerAlignment: Left
+SpacesBeforeTrailingComments: 2
+AlignOperands: Align
+AccessModifierOffset: -2
+ColumnLimit: 0
+MaxEmptyLinesToKeep: 2          
+SeparateDefinitionBlocks: Always
+IncludeBlocks: Preserve 
+IndentPPDirectives: AfterHash 
