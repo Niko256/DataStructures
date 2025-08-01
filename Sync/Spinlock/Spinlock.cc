@@ -1,5 +1,7 @@
 #include "Spinlock.hpp"
 #include <algorithm>
+#include <atomic>
+#include <chrono>
 
 void Spinlock::lock() noexcept {
     // Initial value for exp.backoff (exponintial backoff reduces contention by increasing delay for each retry)
@@ -48,6 +50,10 @@ bool Spinlock::try_lock() noexcept {
     }
 
     return !flag_.exchange(true, std::memory_order_acquire);
+}
+
+bool Spinlock::is_locked() const noexcept {
+    return flag_.load(std::memory_order_relaxed);
 }
 
 void Spinlock::unlock() noexcept {

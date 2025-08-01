@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -26,12 +27,20 @@ class Spinlock {
     ~Spinlock() = default;
 
     Spinlock(Spinlock&&) = delete;
+    Spinlock& operator=(Spinlock&&) = delete;
     Spinlock(const Spinlock&) = delete;
-    Spinlock& operator=(const Spinlock&&) = delete;
     Spinlock& operator=(const Spinlock&) = delete;
 
     void lock() noexcept;
     bool try_lock() noexcept;
+    bool is_locked() const noexcept;
     void unlock() noexcept;
+
+    template <typename Rep, typename Period>
+    bool try_lock_for(const std::chrono::duration<Rep, Period>& rel_time) noexcept;
+
+    template <typename Clock, typename Duration>
+    bool try_lock_until(const std::chrono::time_point<Clock, Duration>& abs_time) noexcept;
 };
 
+#include "Spinlock.tpp"
