@@ -52,6 +52,11 @@ bool Spinlock::try_lock_for(const std::chrono::duration<Rep, Period>& rel_time) 
 template <typename Clock, typename Duration>
 bool Spinlock::try_lock_until(const std::chrono::time_point<Clock, Duration>& abs_time) noexcept {
 
+    // First check if deadline already passed
+    if (Clock::now() >= abs_time) {
+        return false;
+    }
+
     if (try_lock()) {
         return true;
     }
