@@ -18,6 +18,5 @@ target_include_directories(
   PRIVATE ${CMAKE_SOURCE_DIR}/Containers
           ${CMAKE_SOURCE_DIR}/external/smhasher/src
           ${CMAKE_SOURCE_DIR}/Sync/Spinlock)
-          ${googletest_SOURCE_DIR}/googletest/include
 
 add_test(NAME DS_TESTS COMMAND TESTS)
