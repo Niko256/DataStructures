@@ -19,4 +19,4 @@ target_include_directories(
           ${CMAKE_SOURCE_DIR}/external/smhasher/src
           ${CMAKE_SOURCE_DIR}/Sync/Spinlock)
 
-add_test(NAME DS_TESTS COMMAND TESTS)
+add_test(NAME DS_TESTS COMMAND $<TARGET_FILE:Tests>)
