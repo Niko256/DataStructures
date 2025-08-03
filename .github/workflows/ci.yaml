@@ -1,0 +1,45 @@
+name: Build and Test
+
+
+on: # trigger
+  push: # event
+    branches:
+      - main
+  pull_request: 
+    branches: 
+      - main
+  workflow_dispatch: {}
+
+
+jobs:
+  build_and_test: # job (sequence of 'steps')
+    name: Build & Test on Ubuntu with GCC
+    runs-on: ubuntu-latest
+
+    steps: 
+      # Step 1 : Clone the repo (with submodules)
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      # Step 2 : Toolchain setup
+      - name: Set up C++ toolchain (GCC 15)
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+          platform: x64
+
+      # Step 3 : Configure project with CMake
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=20
+
+      # Step 4 : Build project
+      - name: Build
+        # -j$(nproc) starts execution of building in parallel with available count of cpu cores
+        run: cmake --build ${{github.workspace}}/build -j$(nproc)
+
+      # Step 5 : Run Ctest
+      - name: Run tests 
+        working-directory: ${{github.workspace}}/build
+        run: ctest --output-on-failure
