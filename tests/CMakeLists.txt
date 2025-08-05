@@ -17,6 +17,6 @@ target_include_directories(
   Tests
   PRIVATE ${CMAKE_SOURCE_DIR}/Containers
           ${CMAKE_SOURCE_DIR}/external/smhasher/src
-          ${CMAKE_SOURCE_DIR}/Sync/Spinlock)
+          ${CMAKE_SOURCE_DIR}/Concurrency/Spinlock)
 
 add_test(NAME DS_TESTS COMMAND $<TARGET_FILE:Tests>)

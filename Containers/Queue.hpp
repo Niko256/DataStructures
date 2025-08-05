@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Stack.hpp" 
-#include <stdexcept>
+#include "Stack.hpp"
 #include <iostream>
+#include <stdexcept>
 
 template <typename T>
 class Queue {
   private:
-    Stack<T> input_stack;   
-    Stack<T> output_stack;  
+    Stack<T> input_stack;
+    Stack<T> output_stack;
 
     void transfer_elements() {
         if (output_stack.empty()) {
@@ -24,10 +24,9 @@ class Queue {
     ~Queue() = default;
 
     Queue(const Queue& other) : input_stack(other.input_stack), output_stack(other.output_stack) {}
-    
-    Queue(Queue&& other) noexcept 
-        : input_stack(std::move(other.input_stack))
-        , output_stack(std::move(other.output_stack)) {}
+
+    Queue(Queue&& other) noexcept
+        : input_stack(std::move(other.input_stack)), output_stack(std::move(other.output_stack)) {}
 
     Queue& operator=(const Queue& other) {
         if (this != &other) {
@@ -85,16 +84,16 @@ class Queue {
     Queue reverse() const {
         Queue reversed;
         Stack<T> temp = output_stack;
-        
+
         for (Stack<T> in_temp = input_stack; !in_temp.empty(); in_temp.pop()) {
             temp.push(in_temp.top());
         }
-        
+
         while (!temp.empty()) {
             reversed.enqueue(std::move(temp.top()));
             temp.pop();
         }
-        
+
         return reversed;
     }
 
