@@ -9,5 +9,6 @@ add_subdirectory(external/googletest)
 enable_testing()
 
 add_subdirectory(Concurrency)
+add_subdirectory(SmartPtrs)
 
 add_subdirectory(tests)

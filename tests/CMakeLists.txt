@@ -11,7 +11,7 @@ file(GLOB TEST_SOURCES "*.cc")
 
 add_executable(Tests ${TEST_SOURCES} ${HASH_SOURCES})
 
-target_link_libraries(Tests gtest gtest_main Spinlock)
+target_link_libraries(Tests gtest gtest_main Spinlock SmartPtrs)
 
 target_include_directories(
   Tests

@@ -16,8 +16,8 @@ class WeakPtr;
 // Abstract base class for control block
 class BaseControlBlock {
   protected:
-    std::atomic<int> shared_count_; // Number of strong references
-    std::atomic<int> weak_count_; // Number of weak references
+    std::atomic<int> shared_count_;  // Number of strong references
+    std::atomic<int> weak_count_;    // Number of weak references
 
   public:
     // Constructor initialise counts
@@ -36,17 +36,16 @@ class BaseControlBlock {
     }
 
     // Decrement shared counter using acquire-release memory order
-    // This function returns true if the count __was__ 1 before decrement 
+    // This function returns true if the count __was__ 1 before decrement
     // (hence it became 0 after the subtraction)
     // This one sync with memory operations that lead to object destruction
     bool decrement_shared() noexcept {
         return shared_count_.fetch_sub(1, std::memory_order_acq_rel) == 1;
     }
 
-
     // Read shared count (acquire memory order to ensure the latest value visibility)
     size_t use_count() const noexcept {
-        return static_cast<size_t>(shared_count_.load(std::memory_order_acquire)); 
+        return static_cast<size_t>(shared_count_.load(std::memory_order_acquire));
     }
 
     // Attempt to increment count atomically
@@ -55,7 +54,7 @@ class BaseControlBlock {
         int old_count = shared_count_.load(std::memory_order_relaxed);
 
         for (;;) {
-            if (old_count == 0) { // hence object is already destroyed
+            if (old_count == 0) {  // hence object is already destroyed
                 return false;
             }
 
@@ -81,10 +80,9 @@ class BaseControlBlock {
     }
 
     // Abstract methods to destroy the managed object and the control blovk itself
-    virtual void destroy_obj() noexcept = 0; // deletes the object (e.g., delete ptr_)
-    virtual void destroy_self() noexcept = 0; // deletes control block instance (e.g., delete __this__)
+    virtual void destroy_obj() noexcept = 0;   // deletes the object (e.g., delete ptr_)
+    virtual void destroy_self() noexcept = 0;  // deletes control block instance (e.g., delete __this__)
 };
-
 
 template <typename T>
 class DefaultControlBlock : public BaseControlBlock {
@@ -103,24 +101,22 @@ class DefaultControlBlock : public BaseControlBlock {
     }
 };
 
-
 template <typename T>
 class MakeSharedControlBlock : public BaseControlBlock {
   private:
     // storage for the object. i use aligned storage here to ensure proper alignment and size
     // the object itself is constructed in this storage using __placement new__
     typename std::aligned_storage_t<sizeof(T), alignof(T)>::type obj_storage_;
-    
+
     // raw ptr to the object within object storage for convenience
     // (it's the same memory as obj_storage_, but cast to T*)
     T* ptr_;
 
   public:
-    
     template <typename... Args>
     explicit MakeSharedControlBlock(Args&&... args) noexcept(noexcept(T(std::forward<Args>(args)...))) {
         // construct T in allocated storage using placement new
-        ptr_ = new (obj_storage_) T(std::forward<Args>(args)...);
+        ptr_ = new (&obj_storage_) T(std::forward<Args>(args)...);
     }
 
     // so, the memory itself will be freed when destroy_self() is called for the whole control block
@@ -131,9 +127,9 @@ class MakeSharedControlBlock : public BaseControlBlock {
         }
     }
 
-    // destroys th control block itself 
+    // destroys th control block itself
     void destroy_self() noexcept override {
-        // deallocates the whole block : MakeSharedControlBlock + T's storage 
+        // deallocates the whole block : MakeSharedControlBlock + T's storage
         delete this;
     }
 
