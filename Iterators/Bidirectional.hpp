@@ -2,12 +2,14 @@
 
 #include <iterator>
 
+namespace data_structures::iterators {
+
 template <typename T>
 class BidirectionalIterator {
-private:
+  private:
     T* current_;
 
-public:
+  public:
     using iterator_category = std::bidirectional_iterator_tag;
     using pointer = T*;
     using reference = T&;
@@ -55,10 +57,10 @@ public:
 
 template <typename T>
 class ConstBidirectionalIterator {
-private:
+  private:
     const T* current_;
 
-public:
+  public:
     using iterator_category = BidirectionalIteratorTag;
     using pointer = const T*;
     using reference = const T&;
@@ -103,3 +105,4 @@ public:
         return current_ != other.current_;
     }
 };
+}  // namespace data_structures::iterators

@@ -7,6 +7,8 @@
 #include <type_traits>
 
 
+namespace data_structures::containers {
+
 template <typename T, typename Allocator = std::allocator<T>>
 class List {
 private:
@@ -339,3 +341,4 @@ private:
         return emplace(position, std::move(value));
     }
 };
+}

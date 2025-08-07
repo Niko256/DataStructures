@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <utility>
 
+namespace data_structures::smart_ptrs {
+
 template <typename T>
 class WeakPtr {
   private:
@@ -115,3 +117,4 @@ class WeakPtr {
         ctr_block_ = nullptr;
     }
 };
+}  // namespace data_structures::smart_ptrs

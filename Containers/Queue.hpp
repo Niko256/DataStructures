@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stdexcept>
 
+namespace data_structures::containers {
+
 template <typename T>
 class Queue {
   private:
@@ -124,3 +126,4 @@ class Queue {
         std::cout << std::endl;
     }
 };
+}  // namespace data_structures::containers

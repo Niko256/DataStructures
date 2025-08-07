@@ -1,18 +1,19 @@
 #pragma once
 
+#include "../DynamicArray.hpp"
+#include "../List.hpp"
+#include "../Pair.hpp"
+#include "Hashers/CityHash.hpp"
+#include "Hashers/MurmurHash.hpp"
+#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <functional>
 #include <iostream>
-#include <cmath>
 #include <stdexcept>
 #include <utility>
-#include "../Pair.hpp"
-#include "../List.hpp"
-#include "../DynamicArray.hpp"
-#include "Hashers/CityHash.hpp"
-#include "Hashers/MurmurHash.hpp"
 
+namespace data_structures::containers {
 
 template <typename Key, typename Value,
           typename Hash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>,
@@ -22,10 +23,9 @@ class HashTable {
   private:
     struct HashNode {
         Pair<const Key, Value> data_;
-        size_t cached_hash_; // Cached hash value for perfomance
+        size_t cached_hash_;  // Cached hash value for perfomance
 
-        HashNode(size_t hash, Key& k, Value& v) : 
-            cached_hash_(hash), data_(k, v) {}
+        HashNode(size_t hash, Key& k, Value& v) : cached_hash_(hash), data_(k, v) {}
 
         HashNode(size_t hash, Key&& k, Value&& v) : cached_hash_(hash), data_(std::move(k), std::move(v)) {}
 
@@ -40,11 +40,11 @@ class HashTable {
         HashNode(HashNode&& other) noexcept : cached_hash_(other.cached_hash_), data_(std::move(other.data_)) {}
     };
 
-  public:    
+  public:
     struct HashTableRef {
         const Key& first;
         Value& second;
-    
+
         HashTableRef(const Key& k, Value& v) : first(k), second(v) {}
     };
 
@@ -96,7 +96,6 @@ class HashTable {
         HashNode* operator->() {
             return &(*it_);
         }
-
     };
 
     struct const_iterator {
@@ -134,46 +133,43 @@ class HashTable {
             return it_ != other.it_;
         }
 
-        
         const HashNode* operator->() const {
             return &(*it_);
         }
-
     };
 
   private:
+    // ----------------------------------------------
 
-// ----------------------------------------------
-
-    Hash hash_; 
-    KeyEqual equal_; // comparator
+    Hash hash_;
+    KeyEqual equal_;  // comparator
     Allocator allocator_;
     ListType elements_;
     DynamicArray<ListIterator> hash_table_;
 
-    size_t size_; // Number of elements
-    size_t bucket_count_{MIN_BUCKET_COUNT}; // Number of buckets 
-    size_t rehash_threshold_; // Threshold for rehashing
+    size_t size_;                            // Number of elements
+    size_t bucket_count_{MIN_BUCKET_COUNT};  // Number of buckets
+    size_t rehash_threshold_;                // Threshold for rehashing
 
     static constexpr float MAX_LOAD_FACTOR = 0.8f;
     static constexpr size_t MIN_BUCKET_COUNT = 7;
 
   public:
-
-// -----------------------------------------------
+    // -----------------------------------------------
 
     void rehash(size_t count) {
         // Ensure minimum bucket count and proper sizing based on load factor
         count = std::max(count, MIN_BUCKET_COUNT);
         count = std::max(count, static_cast<size_t>(std::ceil(size_ / MAX_LOAD_FACTOR)));
-    
+
         // Early return if no resizing needed
-        if (count == bucket_count_) return;
+        if (count == bucket_count_)
+            return;
 
         try {
             // Create new hash table with desired size, initialized with end iterators
             DynamicArray<ListIterator> new_table(count, elements_.end());
-        
+
             // Redistribute existing elements into new table
             for (auto it = elements_.begin(); it != elements_.end(); ++it) {
                 // Calculate new index using cached hash value
@@ -191,12 +187,11 @@ class HashTable {
             // Recalculate rehashing threshold
             rehash_threshold_ = static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR);
 
-        } catch(const std::bad_alloc& e) {
+        } catch (const std::bad_alloc& e) {
             // Propagate memory allocation failures
             throw;
         }
     }
-
 
     void clear() {
         elements_.clear();
@@ -206,22 +201,20 @@ class HashTable {
         rehash_threshold_ = static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR);
     }
 
-    HashTable() : 
-        bucket_count_(MIN_BUCKET_COUNT),
-        size_(0), 
-        rehash_threshold_(static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR)) {
-            
-            hash_table_ = DynamicArray<ListIterator>(bucket_count_, elements_.end());
+    HashTable() : bucket_count_(MIN_BUCKET_COUNT),
+                  size_(0),
+                  rehash_threshold_(static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR)) {
+
+        hash_table_ = DynamicArray<ListIterator>(bucket_count_, elements_.end());
     }
 
     explicit HashTable(
-            size_t bucket_count, const Hash& hash = Hash(),
-            const KeyEqual& equal = KeyEqual(),
-            const Allocator& alloc = Allocator()) : 
-            hash_(hash), equal_(equal), allocator_(alloc),
-            bucket_count_(std::max(bucket_count, MIN_BUCKET_COUNT)),
-            hash_table_(bucket_count, elements_.end()), size_(0),
-            rehash_threshold_(static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR)) {}
+        size_t bucket_count, const Hash& hash = Hash(),
+        const KeyEqual& equal = KeyEqual(),
+        const Allocator& alloc = Allocator()) : hash_(hash), equal_(equal), allocator_(alloc),
+                                                bucket_count_(std::max(bucket_count, MIN_BUCKET_COUNT)),
+                                                hash_table_(bucket_count, elements_.end()), size_(0),
+                                                rehash_threshold_(static_cast<size_t>(bucket_count_ * MAX_LOAD_FACTOR)) {}
 
     HashTable& operator=(const HashTable& other) {
         if (this != &other) {
@@ -251,44 +244,41 @@ class HashTable {
         return *this;
     }
 
-    HashTable(HashTable&& other) noexcept :
-        hash_(std::move(other.hash_)),
-        equal_(std::move(other.equal_)),
-        allocator_(std::move(other.allocator_)),
-        elements_(std::move(other.elements_)),
-        hash_table_(std::move(other.hash_table_)),
-        size_(other.size_),
-        bucket_count_(other.bucket_count_),
-        rehash_threshold_(other.rehash_threshold_) {
-    
-            other.size_ = 0;
-            other.bucket_count_ = MIN_BUCKET_COUNT;
-            other.rehash_threshold_ = static_cast<size_t>(MIN_BUCKET_COUNT * MAX_LOAD_FACTOR);
+    HashTable(HashTable&& other) noexcept : hash_(std::move(other.hash_)),
+                                            equal_(std::move(other.equal_)),
+                                            allocator_(std::move(other.allocator_)),
+                                            elements_(std::move(other.elements_)),
+                                            hash_table_(std::move(other.hash_table_)),
+                                            size_(other.size_),
+                                            bucket_count_(other.bucket_count_),
+                                            rehash_threshold_(other.rehash_threshold_) {
+
+        other.size_ = 0;
+        other.bucket_count_ = MIN_BUCKET_COUNT;
+        other.rehash_threshold_ = static_cast<size_t>(MIN_BUCKET_COUNT * MAX_LOAD_FACTOR);
     }
 
-    HashTable(const HashTable& other) :
-        hash_(other.hash_),
-        equal_(other.equal_),
-        allocator_(AllocTraits::select_on_container_copy_construction(other.allocator_)),
-        elements_(), hash_table_(other.bucket_count_, elements_.end()),
-        size_(0), bucket_count_(other.bucket_count_),
-        rehash_threshold_(other.rehash_threshold_) {
-    
+    HashTable(const HashTable& other) : hash_(other.hash_),
+                                        equal_(other.equal_),
+                                        allocator_(AllocTraits::select_on_container_copy_construction(other.allocator_)),
+                                        elements_(), hash_table_(other.bucket_count_, elements_.end()),
+                                        size_(0), bucket_count_(other.bucket_count_),
+                                        rehash_threshold_(other.rehash_threshold_) {
+
         for (const auto& elem : other.elements_) {
             insert(elem);
         }
     }
 
-    HashTable(const HashTable& other, const Allocator& alloc) :
-        hash_(other.hash_),
-        equal_(other.equal_),
-        allocator_(alloc),
-        elements_(), 
-        hash_table_(other.bucket_count_, elements_.end()),
-        size_(0),
-        bucket_count_(other.bucket_count_),
-        rehash_threshold_(other.rehash_threshold_) {
-            for (const auto& elem : other.elements_) {
+    HashTable(const HashTable& other, const Allocator& alloc) : hash_(other.hash_),
+                                                                equal_(other.equal_),
+                                                                allocator_(alloc),
+                                                                elements_(),
+                                                                hash_table_(other.bucket_count_, elements_.end()),
+                                                                size_(0),
+                                                                bucket_count_(other.bucket_count_),
+                                                                rehash_threshold_(other.rehash_threshold_) {
+        for (const auto& elem : other.elements_) {
             insert(elem);
         }
     }
@@ -319,7 +309,7 @@ class HashTable {
     }
 
     void insert(const HashNode& node) {
-        auto [it, inserted] = emplace(node.get_key(), node.get_value()); 
+        auto [it, inserted] = emplace(node.get_key(), node.get_value());
     }
 
     void insert(HashNode&& node) {
@@ -336,13 +326,13 @@ class HashTable {
     template <typename... Args>
     Pair<iterator, bool> emplace(Args&&... args) {
         try {
-            
+
             // Create a temporary pair from forwarded arguments
-            BaseNodeType tmp_pair(std::forward<Args>(args)...); 
-            
+            BaseNodeType tmp_pair(std::forward<Args>(args)...);
+
             // Calculate hash value for the key
             const size_t hash_value = hash_(tmp_pair.first_);
-            
+
             // Determine bucket index using modulo
             size_t bucket_index = hash_value % bucket_count_;
 
@@ -362,16 +352,16 @@ class HashTable {
                     size_t new_count = next_prime(bucket_count_ * 2);
                     rehash(new_count);
                     bucket_index = hash_value % bucket_count_;
-                }
-                catch (const std::bad_alloc& e) {
-                    if (size_ >= bucket_count_) throw; // Rethrow if critical
+                } catch (const std::bad_alloc& e) {
+                    if (size_ >= bucket_count_)
+                        throw;  // Rethrow if critical
                 }
             }
 
             // Create new node with the hash value and moved data
-            HashNode node(hash_value, 
-                         std::move(const_cast<Key&>(tmp_pair.first_)), 
-                         std::move(tmp_pair.second_));
+            HashNode node(hash_value,
+                          std::move(const_cast<Key&>(tmp_pair.first_)),
+                          std::move(tmp_pair.second_));
 
             // Find insertion position in the bucket
             auto inserted_position = hash_table_[bucket_index];
@@ -381,21 +371,19 @@ class HashTable {
 
             // Insert the node into the list
             auto inserted_it = elements_.emplace(inserted_position, std::move(node));
-        
+
             // Update bucket head if needed
             if (hash_table_[bucket_index] == elements_.end()) {
                 hash_table_[bucket_index] = inserted_it;
             }
 
             ++size_;
-            return {iterator(inserted_it), true}; // Successfully inserted
+            return {iterator(inserted_it), true};  // Successfully inserted
 
-        }
-        catch (const std::bad_alloc& e) {
+        } catch (const std::bad_alloc& e) {
             std::cout << "Bad alloc caught at: " << __LINE__ << std::endl;
-            throw; 
-        }
-        catch (const std::exception& e) {
+            throw;
+        } catch (const std::exception& e) {
             std::cout << "Exception caught at: " << __LINE__ << std::endl;
             throw;
         }
@@ -410,12 +398,11 @@ class HashTable {
         return emplace(key, std::forward<Args>(args)...);
     }
 
-
     void erase(iterator position) {
         if (position == end()) {
             return;
         }
-        
+
         size_t hash_value = position.it_->cached_hash_;
         size_t bucket_index = hash_value % bucket_count_;
 
@@ -464,7 +451,6 @@ class HashTable {
         return count;
     }
 
-
     iterator find(const Key& key) {
         const size_t hash_value = hash_(key);
         const size_t bucket_index = hash_value % bucket_count_;
@@ -483,7 +469,7 @@ class HashTable {
         const size_t hash_value = hash_(key);
         const size_t bucket_index = hash_value % bucket_count_;
 
-        
+
         auto current = hash_table_[bucket_index];
         while (current != elements_.end() && current->cached_hash_ % bucket_count_ == bucket_index) {
             if (equal_(current->data_.first_, key)) {
@@ -508,7 +494,8 @@ class HashTable {
     const Value& operator[](const Key& key) const {
         auto it = find(key);
 
-        if (it == end()) throw std::out_of_range("Key not found!");
+        if (it == end())
+            throw std::out_of_range("Key not found!");
 
         return it.it_->data_.second_;
     }
@@ -516,7 +503,8 @@ class HashTable {
     Value& at(const Key& key) {
         auto it = find(key);
 
-        if (it == end()) throw std::out_of_range("Key not found");
+        if (it == end())
+            throw std::out_of_range("Key not found");
 
         return it.it_->data_.second_;
     }
@@ -538,7 +526,8 @@ class HashTable {
     }
 
     size_t bucket(const Key& key) const {
-        if (empty()) throw std::out_of_range("Empty hash table");
+        if (empty())
+            throw std::out_of_range("Empty hash table");
         return hash_(key) % bucket_count_;
     }
 
@@ -554,11 +543,12 @@ class HashTable {
         if (hash_index >= bucket_count_) {
             throw std::out_of_range("Invalid bucket index");
         }
-        
-        auto it  = hash_table_[hash_index];
+
+        auto it = hash_table_[hash_index];
         size_t count = 0;
 
-        if (it == elements_.end()) return 0;
+        if (it == elements_.end())
+            return 0;
 
         while (it != elements_.end() && it->cached_hash_ % bucket_count_ == hash_index) {
             ++count;
@@ -591,15 +581,18 @@ class HashTable {
         std::swap(equal_, other.equal_);
 
         if (AllocTraits::propagate_on_container_swap::value) {
-            std::swap(allocator_,other.allocator_);
+            std::swap(allocator_, other.allocator_);
         }
     }
 
-private:
+  private:
     bool is_prime(size_t n) const noexcept {
-        if (n <= 1) return false;
-        if (n <= 3) return true;
-        if (n % 2 == 0 || n % 3 == 0) return false;
+        if (n <= 1)
+            return false;
+        if (n <= 3)
+            return true;
+        if (n % 2 == 0 || n % 3 == 0)
+            return false;
 
         for (size_t i = 5; i * i <= n; i += 6) {
             if (n % i == 0 || n % (i + 2) == 0) {
@@ -610,12 +603,13 @@ private:
     }
 
     size_t next_prime(size_t n) const noexcept {
-        if (n <= 2) return 2;
+        if (n <= 2)
+            return 2;
 
         size_t prime = n;
         bool found = false;
 
-        while(!found) {
+        while (!found) {
             ++prime;
             if (is_prime(prime)) {
                 found = true;
@@ -624,4 +618,4 @@ private:
         return prime;
     }
 };
-
+}  // namespace data_structures::containers

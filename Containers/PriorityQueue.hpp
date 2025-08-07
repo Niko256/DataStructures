@@ -3,33 +3,41 @@
 #include <functional>
 #include <type_traits>
 
+namespace data_structures::containers {
+
 template <typename T>
 class PriorityNode {
-public:
+  public:
     long priority;
     T item;
 
     PriorityNode() : priority(0), item(T()) {}
+
     PriorityNode(const long priority, const T& value) : priority(priority), item(value) {}
 
     bool operator<(const PriorityNode& other) const { return priority < other.priority; }
+
     bool operator>(const PriorityNode& other) const { return priority > other.priority; }
+
     bool operator<=(const PriorityNode& other) const { return priority <= other.priority; }
+
     bool operator>=(const PriorityNode& other) const { return priority >= other.priority; }
+
     bool operator==(const PriorityNode& other) const { return priority == other.priority; }
 };
 
-template<typename T, typename Container = DynamicArray<PriorityNode<T>>,
-         typename Compare = std::less<PriorityNode<T>>>
+template <typename T, typename Container = DynamicArray<PriorityNode<T>>,
+          typename Compare = std::less<PriorityNode<T>>>
 class PriorityQueue {
-private:
+  private:
     Container c;
     Compare comp;
 
     void heapify_up(size_t index) {
         while (index > 0) {
             size_t parent = (index - 1) / 2;
-            if (!comp(c[parent], c[index])) break;
+            if (!comp(c[parent], c[index]))
+                break;
             std::swap(c[index], c[parent]);
             index = parent;
         }
@@ -47,14 +55,15 @@ private:
             if (right < size && comp(c[largest], c[right]))
                 largest = right;
 
-            if (largest == index) break;
+            if (largest == index)
+                break;
 
             std::swap(c[index], c[largest]);
             index = largest;
         }
     }
 
-public:
+  public:
     // Type definitions
 
     using value_type = PriorityNode<T>;
@@ -68,16 +77,16 @@ public:
 
     // Constructors
     PriorityQueue() = default;
+
     explicit PriorityQueue(const Compare& compare) : comp(compare) {}
 
-    template<typename InputIt>
+    template <typename InputIt>
     PriorityQueue(InputIt first, InputIt last, const Compare& compare = Compare()) : comp(compare) {
         while (first != last) {
             push(*first);
             ++first;
         }
     }
-
 
     PriorityQueue(std::initializer_list<value_type> init, const Compare& compare = Compare()) : comp(compare) {
         c.reserve(init.size());
@@ -96,32 +105,41 @@ public:
     }
 
     bool operator==(const PriorityQueue& other) const { return c == other.c; }
+
     bool operator!=(const PriorityQueue& other) const { return !(*this == other); }
 
     Compare value_comp() const { return comp; }
 
     // Iterators
     iterator begin() noexcept { return c.begin(); }
+
     const_iterator begin() const noexcept { return c.begin(); }
+
     const_iterator cbegin() const noexcept { return c.cbegin(); }
-    
+
     iterator end() noexcept { return c.end(); }
+
     const_iterator end() const noexcept { return c.end(); }
+
     const_iterator cend() const noexcept { return c.cend(); }
-    
+
     reverse_iterator rbegin() noexcept { return c.rbegin(); }
+
     const_reverse_iterator rbegin() const noexcept { return c.rbegin(); }
-    
+
     reverse_iterator rend() noexcept { return c.rend(); }
+
     const_reverse_iterator rend() const noexcept { return c.rend(); }
 
     // Capacity
     bool empty() const noexcept { return c.empty(); }
+
     size_type size() const noexcept { return c.size(); }
-    
+
     // Element access
     const_reference top() const {
-        if (empty()) throw std::runtime_error("Priority queue is empty");
+        if (empty())
+            throw std::runtime_error("Priority queue is empty");
         return c.front();
     }
 
@@ -131,21 +149,24 @@ public:
         heapify_up(c.size() - 1);
     }
 
-    template<typename... Args>
+    template <typename... Args>
     void emplace(Args&&... args) {
         c.emplace_back(std::forward<Args>(args)...);
         heapify_up(c.size() - 1);
     }
 
     void pop() {
-        if (empty()) throw std::runtime_error("Priority queue is empty");
+        if (empty())
+            throw std::runtime_error("Priority queue is empty");
         c[0] = std::move(c.back());
         c.pop_back();
-        if (!empty()) heapify_down(0);
+        if (!empty())
+            heapify_down(0);
     }
 
     T extract_min() {
-        if (empty()) throw std::runtime_error("Priority queue is empty");
+        if (empty())
+            throw std::runtime_error("Priority queue is empty");
         T result = c.front().item;
         pop();
         return result;
@@ -167,18 +188,20 @@ public:
     void reserve(size_type new_cap) { c.reserve(new_cap); }
 
     void merge(PriorityQueue& other) {
-        if (this == &other) return;
-    
+        if (this == &other)
+            return;
+
         c.reserve(c.size() + other.size());
-    
+
         for (auto& elem : other.c) {
             c.push_back(std::move(elem));
         }
-    
+
         for (int i = (c.size() / 2) - 1; i >= 0; --i) {
             heapify_down(i);
         }
-    
+
         other.clear();
     }
 };
+}  // namespace data_structures::containers

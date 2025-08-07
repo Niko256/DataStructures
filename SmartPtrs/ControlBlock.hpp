@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <utility>
 
+namespace data_structures::smart_ptrs {
 
 template <typename T>
 class SharedPtr;
@@ -137,3 +138,4 @@ class MakeSharedControlBlock : public BaseControlBlock {
         return ptr_;
     }
 };
+}  // namespace data_structures::smart_ptrs

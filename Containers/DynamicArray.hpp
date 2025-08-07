@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <utility>
 
+namespace data_structures::containers {
+
 template <typename T, typename Allocator = std::allocator<T>>
 class DynamicArray {
   private:
@@ -425,3 +427,4 @@ class DynamicArray {
         return size_ == 0;
     }
 };
+}

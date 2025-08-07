@@ -4,6 +4,27 @@
 #include "../SmartPtrs/ControlBlock.hpp"
 #include "../SmartPtrs/UniquePtr.hpp"
 
+
+template <typename T>
+using UniquePtr = data_structures::smart_ptrs::UniquePtr<T>;
+
+template <typename T>
+using SharedPtr = data_structures::smart_ptrs::SharedPtr<T>;
+
+template <typename T>
+using WeakPtr = data_structures::smart_ptrs::WeakPtr<T>;
+
+template <typename T, typename... Args>  
+auto make_unique(Args&&... args) {  
+    return data_structures::smart_ptrs::make_unique<T>(std::forward<Args>(args)...);  
+}
+
+template <typename T, typename... Args> 
+auto make_shared(Args&&... args) {  
+    return data_structures::smart_ptrs::make_shared<T>(std::forward<Args>(args)...);  
+}
+
+
 struct DestructionTracker {
     static int instances_destroyed;
     DestructionTracker() = default;

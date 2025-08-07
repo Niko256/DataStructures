@@ -1,8 +1,10 @@
 #pragma once
 
 #include "DynamicArray.hpp"
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
+
+namespace data_structures::containers {
 
 template <typename T>
 class Stack {
@@ -14,9 +16,11 @@ class Stack {
     ~Stack() = default;
 
     Stack(const DynamicArray<T>& cont) : container_(cont) {}
+
     Stack(DynamicArray<T>&& cont) noexcept : container_(std::move(cont)) {}
 
     Stack(const Stack& other) : container_(other.container_) {}
+
     Stack(Stack&& other) noexcept : container_(std::move(other.container_)) {}
 
     Stack& operator=(const Stack& other) {
@@ -41,11 +45,11 @@ class Stack {
     }
 
     T& top() {
-        if (container_.empty()) throw std::runtime_error("Stack is empty");
+        if (container_.empty())
+            throw std::runtime_error("Stack is empty");
 
         return container_.back();
     }
-
 
     void pop() {
         if (container_.empty()) {
@@ -113,7 +117,6 @@ class Stack {
         container_.resize(new_size);
     }
 
-
     void print_stack() const {
         for (size_t i = 0; i < container_.size(); ++i) {
             std::cout << container_[container_.size() - i - 1] << " ";
@@ -121,3 +124,4 @@ class Stack {
         std::cout << std::endl;
     }
 };
+}  // namespace data_structures::containers

@@ -3,12 +3,14 @@
 #include <cstddef>
 #include <iterator>
 
+namespace data_structures::iterators {
+
 template <typename T>
 class RandomAccessIterator {
-private:
+  private:
     T* current_;
 
-public:
+  public:
     using iterator_category = std::random_access_iterator_tag;
     using value_type = T;
     using pointer = T*;
@@ -97,14 +99,12 @@ public:
     }
 };
 
-
-
 template <typename T>
 class ConstRandomAccessIterator {
-private:
+  private:
     const T* current_;
 
-public:
+  public:
     using iterator_category = RandomAccessIteratorTag;
     using pointer = const T*;
     using reference = const T&;
@@ -191,3 +191,4 @@ public:
         return current_ >= other.current_;
     }
 };
+}  // namespace data_structures::iterators

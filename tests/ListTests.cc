@@ -2,6 +2,9 @@
 #include "../Containers/List.hpp"
 #include <string>
 
+template <typename T>
+using List = data_structures::containers::List<T>;
+
 class ListTest : public ::testing::Test {
 protected:
     List<int> list;

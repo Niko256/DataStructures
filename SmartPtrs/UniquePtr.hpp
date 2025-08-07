@@ -4,6 +4,8 @@
 #include <type_traits>
 #include <utility>
 
+namespace data_structures::smart_ptrs {
+
 template <typename T>
 struct DefaultDelete {
     void operator()(T* ptr) const {
@@ -125,3 +127,4 @@ template <typename T, typename... Args>
 UniquePtr<T> make_unique(Args&&... args) {
     return UniquePtr<T>(new T(std::forward<Args>(args)...));
 }
+}  // namespace data_structures::smart_ptrs

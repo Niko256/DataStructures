@@ -1,11 +1,8 @@
-#include "Spinlock.hpp"
-#include <atomic>
-#include <chrono>
-#include <cstdint>
+#include "Preamble.hpp"
 
 template <typename Rep, typename Period>
-bool Spinlock::try_lock_for(const std::chrono::duration<Rep, Period>& rel_time) noexcept {
-    auto start_time = std::chrono::steady_clock::now();
+bool Spinlock::try_lock_for(const ::std::chrono::duration<Rep, Period>& rel_time) noexcept {
+    auto start_time = ::std::chrono::steady_clock::now();
 
     // Initial attempt to acquire the lock
     if (try_lock()) {
@@ -16,7 +13,7 @@ bool Spinlock::try_lock_for(const std::chrono::duration<Rep, Period>& rel_time) 
     uint32_t backoff = SPIN_INITIAL_BACKOFF;
 
     for (;;) {
-        if (std::chrono::steady_clock::now() - start_time >= rel_time) {
+        if (::std::chrono::steady_clock::now() - start_time >= rel_time) {
             // Timeout, lock is not acquired
             return false;
         }
@@ -26,31 +23,31 @@ bool Spinlock::try_lock_for(const std::chrono::duration<Rep, Period>& rel_time) 
         for (uint32_t i = 0; i < backoff; ++i) {
             CPU_PAUSE();
 
-            if (std::chrono::steady_clock::now() - start_time >= rel_time) {
+            if (::std::chrono::steady_clock::now() - start_time >= rel_time) {
                 return false;
             }
 
             // If the lock becomes free => break early to attempt of acquiring the lock  in outer loop
-            if (!flag_.load(std::memory_order_relaxed)) {
+            if (!flag_.load(::std::memory_order_relaxed)) {
                 break;
             }
         }
 
         // Attempt to acquire the lock after backoff
         // This check is outside the inner backoff loop to limit frequency of exchanges
-        if (!flag_.load(std::memory_order_relaxed)) {
-            if (!flag_.exchange(true, std::memory_order_acquire)) {
+        if (!flag_.load(::std::memory_order_relaxed)) {
+            if (!flag_.exchange(true, ::std::memory_order_acquire)) {
                 return true;
             }
         }
 
         // Increase the backoff for the next iteration
-        backoff = std::min(backoff << 1, SPIN_MAX_BACKOFF);
+        backoff = ::std::min(backoff << 1, SPIN_MAX_BACKOFF);
     }
 }
 
 template <typename Clock, typename Duration>
-bool Spinlock::try_lock_until(const std::chrono::time_point<Clock, Duration>& abs_time) noexcept {
+bool Spinlock::try_lock_until(const ::std::chrono::time_point<Clock, Duration>& abs_time) noexcept {
 
     // First check if deadline already passed
     if (Clock::now() >= abs_time) {
@@ -80,17 +77,17 @@ bool Spinlock::try_lock_until(const std::chrono::time_point<Clock, Duration>& ab
             }
 
             // If the lock becomes free => break
-            if (!flag_.load(std::memory_order_relaxed)) {
+            if (!flag_.load(::std::memory_order_relaxed)) {
                 break;
             }
         }
 
-        if (!flag_.load(std::memory_order_relaxed)) {
-            if (!flag_.exchange(true, std::memory_order_acquire)) {  // Set
+        if (!flag_.load(::std::memory_order_relaxed)) {
+            if (!flag_.exchange(true, ::std::memory_order_acquire)) {  // Set
                 return true;
             }
         }
 
-        backoff = std::min(backoff << 1, SPIN_MAX_BACKOFF);
+        backoff = ::std::min(backoff << 1, SPIN_MAX_BACKOFF);
     }
 }

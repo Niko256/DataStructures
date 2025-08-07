@@ -3,12 +3,14 @@
 #include <cstddef>
 #include <iterator>
 
+namespace data_structures::iterators {
+
 template <typename Iterator>
 class ReverseRandomAccessIterator {
-private:
+  private:
     Iterator current_;
 
-public:
+  public:
     using iterator_category = std::reverse_iterator<Iterator>;
     using pointer = typename Iterator::pointer;
     using reference = typename Iterator::reference;
@@ -47,11 +49,9 @@ public:
         return tmp;
     }
 
-
     ptrdiff_t operator-(const ReverseRandomAccessIterator& other) const {
         return other.current_ - current_;
     }
-
 
     bool operator==(const ReverseRandomAccessIterator& other) const {
         return current_ == other.current_;
@@ -80,10 +80,10 @@ public:
 
 template <typename Iterator>
 class ReverseBidirectionalIterator {
-private:
+  private:
     Iterator current_;
 
-public:
+  public:
     using iterator_category = BidirectionalIteratorTag;
     using pointer = typename Iterator::pointer;
     using reference = typename Iterator::reference;
@@ -130,3 +130,4 @@ public:
         return current_ != other.current_;
     }
 };
+}  // namespace data_structures::iterators
