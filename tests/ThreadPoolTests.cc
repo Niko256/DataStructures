@@ -1,3 +1,4 @@
+#include <atomic>
 #include <gtest/gtest.h>
 #include "../Concurrency/WaitGroup/WaitGroup.hpp"
 #include "../Concurrency/ThreadPool/Queue.hpp"
@@ -184,12 +185,53 @@ TEST_F(ThreadPoolTests, ZeroThreadsPool) {
 #if NDEBUG
 #warning "Death tests are disabled in release builds (NDEBUG is defined)."
 #else
+/// Death test. We want to verify that submit() triggers an assert 
+/// if it's called after stop() has been initiated but before it has completed
 TEST(ThreadPoolDeathTest, SubmitAfterStopAsserts) {
     auto routine = [] {
         ThreadPool pool(1);
         pool.start();
-        pool.stop();
-        pool.submit([] {});
+
+        WaitGroup wg;
+
+        // so, we want to simulate race condition here
+        std::atomic<bool> stop_called = false;
+
+        // the goal is to call submit() precisely when stop() has started but IS BLOCKED, 
+        // waiting for a worker thread to finish
+        wg.add(1);
+
+        /// We submit a task that will never finish. This will cause .stop()
+        // to get stuck in its .join() loop, allowing us to test
+        // the state of the pool "mid-shutdown".
+        pool.submit([&]{
+            while (!stop_called.load(std::memory_order_acquire)) {
+                std::this_thread::yield();
+            }
+            // By NOT calling a WaitGroup's Done(), this task effectively hangs forever
+        });
+
+        // Give the worker thread a moment to pick up the task from the queue
+        // After this sleep, we can be reasonably sure the task is running
+        std::this_thread::sleep_for(20ms);
+
+        std::thread stop_thread([&]{
+            pool.stop(); // This call will hang on worker.join()
+        });
+
+        stop_called.store(true, std::memory_order_release);
+
+        // After this sleep, we are confident that the stopped_ flag inside
+        // the pool has been set to 'true', and the task queue has been closed
+        std::this_thread::sleep_for(20ms);
+
+        // This is the core of the test. We are now in the perfect state:
+        //  .stop() has been called (stopped_ is true)
+        //  .stop() has NOT completed (the worker thread is still "alive").
+        // Calling submit() now should trigger the assert(started_ && !stopped_)
+        pool.submit([]{});
+
+        stop_thread.join();
     };
 
     ASSERT_DEATH(routine(), "started_ && !stopped_");
