@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../WaitGroup/WaitGroup.hpp"
 #include "Queue.hpp"
 #include <atomic>
 #include <cassert>
@@ -56,11 +55,19 @@ class ThreadPool {
 
     void start();
 
-    void submit(Task task);
-
     void stop();
 
     static ThreadPool* current();
+
+    void submit(Task task);
+
+    /// TODO : [FEATURE] Implement std::future-based version of submit method for tasks that return values
+    /// [this would allow the pool to handle tasks that return values]
+    ///
+    /// The signature should looks like:
+    ///
+    /// template <typename Func, typename... Args>
+    /// auto submit(Func&& func, Args&&... args) -> std::future<decltype(func(args...))>;
 
   private:
 
