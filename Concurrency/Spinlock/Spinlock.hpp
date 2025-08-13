@@ -36,4 +36,4 @@ class Spinlock {
 };
 
 #include "Spinlock.tpp"
-}// namespace data_structures::concurrency
+}  // namespace data_structures::concurrency

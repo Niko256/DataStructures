@@ -12,6 +12,8 @@
 
 using namespace std::chrono_literals;
 
+using WaitGroup = data_structures::concurrency::WaitGroup; 
+using ThreadPool = data_structures::concurrency::ThreadPool;
 
 
 // =============================================
@@ -193,5 +195,3 @@ TEST(ThreadPoolDeathTest, SubmitAfterStopAsserts) {
     ASSERT_DEATH(routine(), "started_ && !stopped_");
 }
 #endif
-
-

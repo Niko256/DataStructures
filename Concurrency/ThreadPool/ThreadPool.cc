@@ -1,5 +1,8 @@
 #include "ThreadPool.hpp"
 
+
+namespace data_structures::concurrency {
+
 ThreadPool::ThreadPool(size_t num_threads) : num_threads_(num_threads > 0 ? num_threads : std::thread::hardware_concurrency()) {}
 
 /// [condition]: destructor must be called after close()
@@ -93,3 +96,4 @@ void ThreadPool::worker_loop() {
         }
     }
 }
+};

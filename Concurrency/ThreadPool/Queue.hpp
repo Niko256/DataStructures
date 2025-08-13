@@ -5,6 +5,8 @@
 #include <optional>
 #include <queue>
 
+namespace data_structures::concurrency {
+
 template <typename T>
 class UnboundedBlockingQueue {
   private:
@@ -36,3 +38,4 @@ class UnboundedBlockingQueue {
 };
 
 #include "Queue.tpp"
+};

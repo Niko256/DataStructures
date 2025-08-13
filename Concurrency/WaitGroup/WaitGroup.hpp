@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <mutex>
 
+namespace data_structures::concurrency {
+
 class WaitGroup {
   private:
     std::mutex mtx_;
@@ -35,3 +37,4 @@ class WaitGroup {
         });
     }
 };
+};  // namespace data_structures::concurrency::wait_group

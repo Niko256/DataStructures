@@ -8,6 +8,8 @@
 #include <thread>
 #include <vector>
 
+namespace data_structures::concurrency {
+
 // This type represents fundamental unit of work in our threadpool
 // as polymorphic wrapper for callable objects
 // it can store everything that can act like a function (lambda, functor, ptr to method, classic function)
@@ -72,4 +74,5 @@ class ThreadPool {
   private:
 
     void worker_loop();
+};
 };
