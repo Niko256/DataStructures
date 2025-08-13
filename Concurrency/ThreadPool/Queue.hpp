@@ -11,7 +11,7 @@ class UnboundedBlockingQueue {
     std::deque<T> task_queue_;
     mutable std::mutex mtx_;
     std::condition_variable cv_;
-    bool closed_ = false;
+    bool is_closed_ = false;
 
   public:
     UnboundedBlockingQueue() = default;
@@ -34,3 +34,5 @@ class UnboundedBlockingQueue {
     // Wakes up all waiting consumers
     void close();
 };
+
+#include "Queue.tpp"

@@ -1,3 +1,4 @@
+#include "Queue.hpp"
 #include <mutex>
 
 template <typename T>
@@ -13,16 +14,16 @@ void UnboundedBlockingQueue<T>::push(T item) {
 }
 
 template <typename T>
-std::optional<T> pop() {
+std::optional<T> UnboundedBlockingQueue<T>::pop() {
     std::unique_lock<std::mutex> lock(mtx_);
 
     // Waits untill queue is not empty OR it has been closed and no more items will be ever produced
     cv_.wait(lock, [this] {
-        return !task_queue_.is_empty() || is_closed_;
+        return !task_queue_.empty() || is_closed_;
     });
 
     // After waking up we have to check the conditions of the queue
-    if (task_queue_.is_empty() && is_closed_) {
+    if (task_queue_.empty() && is_closed_) {
         return std::nullopt;
     }
 
@@ -33,14 +34,12 @@ std::optional<T> pop() {
     return item;
 }
 
-
-
 template <typename T>
 void UnboundedBlockingQueue<T>::close() {
     {
         std::lock_guard<std::mutex> lock(mtx_);
 
-        closed_ = true;
+        is_closed_ = true;
     }
     // We must notify all threads that our queue has closed
     // so any thread blocked in the pop() method

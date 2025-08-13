@@ -1,11 +1,11 @@
+#include "../Concurrency/Spinlock/Spinlock.hpp"
+#include "gtest/gtest.h"
 #include <atomic>
 #include <chrono>
 #include <future>
 #include <mutex>
 #include <thread>
 #include <vector>
-#include "../Concurrency/Spinlock/Spinlock.hpp"
-#include "gtest/gtest.h"
 
 
 using Spinlock = data_structures::concurrency::Spinlock;

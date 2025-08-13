@@ -11,12 +11,13 @@ file(GLOB TEST_SOURCES "*.cc")
 
 add_executable(Tests ${TEST_SOURCES} ${HASH_SOURCES})
 
-target_link_libraries(Tests gtest gtest_main Spinlock SmartPtrs)
+target_link_libraries(Tests gtest gtest_main Spinlock SmartPtrs ThreadPool)
 
 target_include_directories(
   Tests
   PRIVATE ${CMAKE_SOURCE_DIR}/Containers
           ${CMAKE_SOURCE_DIR}/external/smhasher/src
-          ${CMAKE_SOURCE_DIR}/Concurrency/Spinlock)
+          ${CMAKE_SOURCE_DIR}/Concurrency/Spinlock
+          ${CMAKE_SOURCE_DIR}/Concurrency/ThreadPool)
 
 add_test(NAME DS_TESTS COMMAND $<TARGET_FILE:Tests>)
