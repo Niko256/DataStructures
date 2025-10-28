@@ -38,4 +38,4 @@ class UnboundedBlockingQueue {
 };
 
 #include "Queue.tpp"
-};
+};  // namespace data_structures::concurrency

@@ -1,7 +1,7 @@
 #include "Spinlock.hpp"
+#include "Preamble.hpp"
 #include <algorithm>
 #include <atomic>
-#include "Preamble.hpp"
 
 namespace data_structures::concurrency {
 

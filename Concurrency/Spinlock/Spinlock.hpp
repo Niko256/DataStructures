@@ -35,5 +35,5 @@ class Spinlock {
     bool try_lock_until(const std::chrono::time_point<Clock, Duration>& abs_time) noexcept;
 };
 
-#include "Spinlock.tpp"
+#include "Spinlock_inl.hpp"
 }  // namespace data_structures::concurrency

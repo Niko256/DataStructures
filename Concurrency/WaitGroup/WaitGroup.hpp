@@ -37,4 +37,6 @@ class WaitGroup {
         });
     }
 };
-};  // namespace data_structures::concurrency::wait_group
+
+
+};  // namespace data_structures::concurrency

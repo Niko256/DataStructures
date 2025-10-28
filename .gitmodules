@@ -1,6 +1,0 @@
-[submodule "external/smhasher"]
-	path = external/smhasher
-	url = https://github.com/aappleby/smhasher.git
-[submodule "external/googletest"]
-	path = external/googletest
-	url = https://github.com/google/googletest.git
