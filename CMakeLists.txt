@@ -23,6 +23,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(smhasher)
 
+FetchContent_Declare(
+    sure
+    GIT_REPOSITORY https://gitlab.com/Lipovsky/sure.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(sure)
+
+
 enable_testing()
 
 add_subdirectory(Concurrency)

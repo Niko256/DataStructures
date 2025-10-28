@@ -4,7 +4,7 @@
 #include <string>
 #include <string>
 #include <type_traits>
-#include "../../../external/smhasher/src/MurmurHash3.h"
+#include "MurmurHash3.h"
 
 template<typename T>
 struct MurmurHash3 {

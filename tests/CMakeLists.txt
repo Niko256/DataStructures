@@ -4,8 +4,8 @@ project(Tests LANGUAGES CXX)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
-set(HASH_SOURCES ${CMAKE_SOURCE_DIR}/external/smhasher/src/City.cpp
-                 ${CMAKE_SOURCE_DIR}/external/smhasher/src/MurmurHash3.cpp)
+set(HASH_SOURCES ${smhasher_SOURCE_DIR}/src/City.cpp
+                 ${smhasher_SOURCE_DIR}/src/MurmurHash3.cpp)
 
 file(GLOB TEST_SOURCES "*.cc")
 
@@ -16,7 +16,7 @@ target_link_libraries(Tests gtest gtest_main Spinlock SmartPtrs ThreadPool)
 target_include_directories(
   Tests
   PRIVATE ${CMAKE_SOURCE_DIR}/Containers
-          ${CMAKE_SOURCE_DIR}/external/smhasher/src
+          ${smhasher_SOURCE_DIR}/src
           ${CMAKE_SOURCE_DIR}/Concurrency/Spinlock
           ${CMAKE_SOURCE_DIR}/Concurrency/ThreadPool)
 

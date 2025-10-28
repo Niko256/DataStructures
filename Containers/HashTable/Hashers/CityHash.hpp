@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../external/smhasher/src/City.h"
+#include "../../../_deps/smhasher-src/src/City.h"
 #include <string>
 #include <type_traits>
 

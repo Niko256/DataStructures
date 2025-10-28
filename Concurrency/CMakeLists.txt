@@ -1,3 +1,4 @@
-add_subdirectory(Spinlock)
-add_subdirectory(ThreadPool)
-# add_subdirectory(Mutex)
+ADD_SUBDIRECTORY(Spinlock)
+ADD_SUBDIRECTORY(ThreadPool)
+# ADD_SUBDIRECTORY(Mutex)
+# ADD_SUBDIRECTORY(Coroutine)
