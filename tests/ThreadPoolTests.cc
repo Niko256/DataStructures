@@ -1,9 +1,9 @@
+#include "../src/Concurrency/ThreadPool/Queue.hpp"
+#include "../src/Concurrency/ThreadPool/ThreadPool.hpp"
+#include "../src/Concurrency/WaitGroup/WaitGroup.hpp"
 #include <atomic>
-#include <gtest/gtest.h>
-#include "../Concurrency/WaitGroup/WaitGroup.hpp"
-#include "../Concurrency/ThreadPool/Queue.hpp"
-#include "../Concurrency/ThreadPool/ThreadPool.hpp"
 #include <future>
+#include <gtest/gtest.h>
 #include <memory>
 #include <mutex>
 #include <numeric>
@@ -13,9 +13,8 @@
 
 using namespace std::chrono_literals;
 
-using WaitGroup = data_structures::concurrency::WaitGroup; 
+using WaitGroup = data_structures::concurrency::WaitGroup;
 using ThreadPool = data_structures::concurrency::ThreadPool;
-
 
 // =============================================
 // ============ WAITGROUP TESTS ============
@@ -31,10 +30,11 @@ TEST(WaitGroupTest, ConcurrentDone) {
     wg.add(task_count);
 
     for (size_t i = 0; i < task_count; ++i) {
-        threads.emplace_back([&]{
+        threads.emplace_back([&] {
             cnt.fetch_add(1);
             wg.done();
-    });}
+        });
+    }
 
     wg.wait();
 
@@ -45,12 +45,10 @@ TEST(WaitGroupTest, ConcurrentDone) {
     SUCCEED();
 }
 
-
-
 TEST(WaitGroupTest, BlocksUntilDone) {
     WaitGroup wg;
     std::atomic<bool> task_done = false;
-    
+
     wg.add(1);
 
     std::jthread task_thread([&] {
@@ -65,15 +63,12 @@ TEST(WaitGroupTest, BlocksUntilDone) {
     ASSERT_TRUE(task_done);
 }
 
-
-
 // =============================================
 // ============ TREADPOOL TESTS ============
 // =============================================
 //
 class ThreadPoolTests : public ::testing::Test {
   protected:
-    
     std::unique_ptr<ThreadPool> pool_;
 
     void SetUp() override {
@@ -86,19 +81,17 @@ class ThreadPoolTests : public ::testing::Test {
     }
 };
 
-
 TEST_F(ThreadPoolTests, ExecutesOneTask) {
     std::promise<void> pr;
     auto future = pr.get_future();
 
-    pool_->submit([&]{
+    pool_->submit([&] {
         pr.set_value();
     });
 
     auto status = future.wait_for(1s);
     ASSERT_EQ(status, std::future_status::ready);
 }
-
 
 TEST_F(ThreadPoolTests, ExecuteManyTasks) {
     const size_t task_count = 10000;
@@ -110,15 +103,13 @@ TEST_F(ThreadPoolTests, ExecuteManyTasks) {
         pool_->submit([&] {
             tasks_executed.fetch_add(1);
             wg.done();
-        });    
+        });
     }
 
     wg.wait();
 
     ASSERT_EQ(tasks_executed.load(), task_count);
 }
-
-
 
 TEST_F(ThreadPoolTests, TasksRunOnDifferentThreads) {
     const size_t task_count = 50;
@@ -128,7 +119,7 @@ TEST_F(ThreadPoolTests, TasksRunOnDifferentThreads) {
 
     wg.add(task_count);
     for (size_t i = 0; i < task_count; ++i) {
-        pool_->submit([&]{
+        pool_->submit([&] {
             {
                 std::lock_guard<std::mutex> lock(mtx);
                 threads_ids.insert(std::this_thread::get_id());
@@ -145,8 +136,6 @@ TEST_F(ThreadPoolTests, TasksRunOnDifferentThreads) {
     ASSERT_LE(threads_ids.size(), 4);
 }
 
-
-
 TEST_F(ThreadPoolTests, CurrentMethod) {
     ASSERT_EQ(ThreadPool::current(), nullptr);
 
@@ -156,22 +145,20 @@ TEST_F(ThreadPoolTests, CurrentMethod) {
     pool_->submit([&p, this] {
         p.set_value(ThreadPool::current());
     });
-    
-    ThreadPool* current_pool_ptr = f.get(); 
-    
+
+    ThreadPool* current_pool_ptr = f.get();
+
     ASSERT_EQ(current_pool_ptr, pool_.get());
 }
 
-
-
 TEST_F(ThreadPoolTests, ZeroThreadsPool) {
-    ThreadPool pool(0); // !std::hardware_concurrency here!
+    ThreadPool pool(0);  // !std::hardware_concurrency here!
     pool.start();
 
     std::promise<void> p;
     auto f = p.get_future();
 
-    pool.submit([&]{
+    pool.submit([&] {
         p.set_value();
     });
 
@@ -181,7 +168,6 @@ TEST_F(ThreadPoolTests, ZeroThreadsPool) {
     pool.stop();
 }
 
-
-///[TODO]: Implement a Death test 
-///where we want to verify that submit() triggers an assert 
+///[TODO]: Implement a Death test
+/// where we want to verify that submit() triggers an assert
 /// if it's called after stop() has been initiated but before it has completed

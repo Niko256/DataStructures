@@ -24,14 +24,14 @@ class ThreadPool {
 
     // ensure visibility of state changes accross threads
     // they are atomic to safely sync with submit() method which can be called from any thread
-    // !!! : A dedicated mutex isn't require here, 
+    // !!! : A dedicated mutex isn't require here,
     // !!! : bc we want to fulfill the condition that start() and stop() are called from a single-managing thread
     // !!! : and are not concurrent with each other.
     //
     std::atomic<bool> started_;
     std::atomic<bool> stopped_;
-    
-    /// TODO::: to ensure that using two atomic flags is a better choice than using an atomic state 
+
+    /// TODO::: to ensure that using two atomic flags is a better choice than using an atomic state
     /// [tbh idk, but maybe alignment to cache-line, bc enum is just 1 byte]
     ///
     // enum class State {
@@ -50,7 +50,7 @@ class ThreadPool {
   public:
     explicit ThreadPool(size_t num_threads);
 
-    ~ThreadPool(); 
+    ~ThreadPool();
 
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool(ThreadPool&&) noexcept = delete;
@@ -72,7 +72,6 @@ class ThreadPool {
     /// auto submit(Func&& func, Args&&... args) -> std::future<decltype(func(args...))>;
 
   private:
-
     void worker_loop();
 };
-};
+};  // namespace data_structures::concurrency

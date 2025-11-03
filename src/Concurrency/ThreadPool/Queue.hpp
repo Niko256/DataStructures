@@ -37,5 +37,5 @@ class UnboundedBlockingQueue {
     void close();
 };
 
-#include "Queue.tpp"
+#include "Queue_inl.hpp"
 };  // namespace data_structures::concurrency

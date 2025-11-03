@@ -1,6 +1,6 @@
-#include "../Containers/HashTable/HashTable.hpp"
-#include "../Containers/HashTable/Hashers/CityHash.hpp"
-#include "../Containers/HashTable/Hashers/MurmurHash.hpp"
+#include "../src/Containers/HashTable/HashTable.hpp"
+#include "../src/Containers/HashTable/Hashers/CityHash.hpp"
+#include "../src/Containers/HashTable/Hashers/MurmurHash.hpp"
 #include <chrono>
 #include <gtest/gtest.h>
 #include <random>

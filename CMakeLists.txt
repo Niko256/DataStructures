@@ -1,39 +1,15 @@
-cmake_minimum_required(VERSION 3.14)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
-project(DataStructures LANGUAGES CXX)
+PROJECT(DataStructures LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_STANDARD 20)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
-
-# GoogleTest
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG main
-)
-FetchContent_MakeAvailable(googletest)
-
-# SMHasher
-FetchContent_Declare(
-    smhasher
-    GIT_REPOSITORY https://github.com/aappleby/smhasher.git
-    GIT_TAG master
-)
-FetchContent_MakeAvailable(smhasher)
-
-FetchContent_Declare(
-    sure
-    GIT_REPOSITORY https://gitlab.com/Lipovsky/sure.git
-    GIT_TAG master
-)
-FetchContent_MakeAvailable(sure)
+ADD_SUBDIRECTORY(third_party)
 
 
-enable_testing()
+ENABLE_TESTING()
 
-add_subdirectory(Concurrency)
-add_subdirectory(SmartPtrs)
+ADD_SUBDIRECTORY(src)
 
-add_subdirectory(tests)
+ADD_SUBDIRECTORY(tests)

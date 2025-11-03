@@ -1,6 +1,6 @@
-add_library(ThreadPool STATIC ThreadPool.cc)
+ADD_LIBRARY(ThreadPool STATIC ThreadPool.cc)
 
-target_include_directories(
+TARGET_INCLUDE_DIRECTORIES(
     ThreadPool
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

@@ -1,8 +1,9 @@
-#include "Queue.hpp"
 #include <mutex>
 
 template <typename T>
 void UnboundedBlockingQueue<T>::push(T item) {
+    if (is_closed_)
+        return;
     {
         std::unique_lock<std::mutex> lock(mtx_);
 
