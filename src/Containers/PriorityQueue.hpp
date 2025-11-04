@@ -1,6 +1,7 @@
 #pragma once
 #include "DynamicArray.hpp"
 #include <functional>
+#include <iterator>
 #include <type_traits>
 
 namespace data_structures::containers {
@@ -70,10 +71,8 @@ class PriorityQueue {
     using reference = value_type&;
     using const_reference = const value_type&;
     using size_type = size_t;
-    using iterator = typename Container::iterator;
-    using const_iterator = typename Container::const_iterator;
-    using reverse_iterator = typename Container::reverse_iterator;
-    using const_reverse_iterator = typename Container::const_reverse_iterator;
+    using iterator = typename std::forward_iterator_tag;
+    using reverse_iterator = typename std::reverse_iterator<iterator>;
 
     // Constructors
     PriorityQueue() = default;
@@ -113,23 +112,7 @@ class PriorityQueue {
     // Iterators
     iterator begin() noexcept { return c.begin(); }
 
-    const_iterator begin() const noexcept { return c.begin(); }
-
-    const_iterator cbegin() const noexcept { return c.cbegin(); }
-
     iterator end() noexcept { return c.end(); }
-
-    const_iterator end() const noexcept { return c.end(); }
-
-    const_iterator cend() const noexcept { return c.cend(); }
-
-    reverse_iterator rbegin() noexcept { return c.rbegin(); }
-
-    const_reverse_iterator rbegin() const noexcept { return c.rbegin(); }
-
-    reverse_iterator rend() noexcept { return c.rend(); }
-
-    const_reverse_iterator rend() const noexcept { return c.rend(); }
 
     // Capacity
     bool empty() const noexcept { return c.empty(); }

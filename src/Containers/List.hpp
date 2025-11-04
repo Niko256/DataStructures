@@ -6,13 +6,11 @@
 #include <stdexcept>
 #include <type_traits>
 
-
 namespace data_structures::containers {
 
 template <typename T, typename Allocator = std::allocator<T>>
 class List {
-private:
-    
+  private:
     struct BaseNode {
         BaseNode* prev = nullptr;
         BaseNode* next = nullptr;
@@ -27,10 +25,12 @@ private:
         T data_;
 
         Node() = default;
-        
+
         template <typename... Args>
         Node(Args&&... args) : data_(std::forward<Args>(args)...) {}
+
         Node(const T& value) : data_(value) {}
+
         Node(T&& value) : data_(std::move(value)) {}
     };
 
@@ -46,7 +46,7 @@ private:
     using allocator_type = Allocator;
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
-    
+
     template <bool is_const>
     class Iterator {
       private:
@@ -55,7 +55,7 @@ private:
 
       public:
         using value_type = std::conditional_t<is_const, const T, T>;
-        using reference = std::conditional_t<is_const, const T& , T&>;
+        using reference = std::conditional_t<is_const, const T&, T&>;
         using pointer = std::conditional_t<is_const, const T*, T*>;
         using iterator_category = std::bidirectional_iterator_tag;
         using difference_type = std::ptrdiff_t;
@@ -64,18 +64,18 @@ private:
 
         Iterator(BaseNode* node) : node_(node) {}
 
-        reference operator*() const { 
+        reference operator*() const {
             if (!is_valid_) {
                 throw std::runtime_error("Attempting to dereference invalid iterator");
             }
-            return static_cast<Node*>(node_)->data_; 
+            return static_cast<Node*>(node_)->data_;
         }
 
-        pointer operator->() const { 
+        pointer operator->() const {
             if (!is_valid_) {
                 throw std::runtime_error("Attempting to dereference invalid iterator");
             }
-            return &static_cast<Node*>(node_)->data_; 
+            return &static_cast<Node*>(node_)->data_;
         }
 
         Iterator& operator++() {
@@ -128,7 +128,7 @@ private:
         BaseNode* get_node() const { return node_; }
 
         void invalidate() { is_valid_ = false; }
-    
+
         friend class List;
     };
 
@@ -138,13 +138,19 @@ private:
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     iterator begin() noexcept { return iterator(head_->next); }
-    iterator begin() const noexcept {return iterator(head_->next); }
+
+    iterator begin() const noexcept { return iterator(head_->next); }
+
     iterator end() noexcept { return iterator(head_); }
+
     iterator end() const noexcept { return iterator(head_); }
 
     reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
+
     const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(end()); }
+
     reverse_iterator rend() noexcept { return reverse_iterator(begin()); }
+
     const_reverse_iterator rend() const noexcept { return const_reverse_iterator(begin()); }
 
     List() : size_(0) {
@@ -153,18 +159,17 @@ private:
     }
 
     // invoke constructor by default firstly and then copy all elements
-    List(const List& other) : List() { 
+    List(const List& other) : List() {
         for (const auto& value : other) {
             push_back(value);
         }
     }
 
-    List(List&& other) noexcept : 
-        head_(other.head_),
-        tail_(other.tail_),
-        size_(other.size_),
-        allocator_(std::move(other.allocator_)),
-        node_allocator_(std::move(other.node_allocator_)) {
+    List(List&& other) noexcept : head_(other.head_),
+                                  tail_(other.tail_),
+                                  size_(other.size_),
+                                  allocator_(std::move(other.allocator_)),
+                                  node_allocator_(std::move(other.node_allocator_)) {
         other.head_ = new BaseNode();
         other.tail_ = other.head_;
         other.size_ = 0;
@@ -189,7 +194,7 @@ private:
         if (this != &other) {
             clear();
             delete head_;
-            
+
             head_ = other.head_;
             tail_ = other.tail_;
             size_ = other.size_;
@@ -203,20 +208,21 @@ private:
         return *this;
     }
 
-    bool operator !=(const List& other) const {
-        if (size_ != other.size_) return true;
+    bool operator!=(const List& other) const {
+        if (size_ != other.size_)
+            return true;
 
         auto it_1 = begin();
         auto it_2 = other.begin();
 
-        while(it_1 != end()) {
-            if (*it_1 != *it_2) return true;
+        while (it_1 != end()) {
+            if (*it_1 != *it_2)
+                return true;
             ++it_1;
             ++it_2;
         }
         return false;
     }
-
 
     void push_back(const T& value) {
         insert(end(), value);
@@ -270,15 +276,13 @@ private:
         }
         return static_cast<Node*>(head_->next)->data_;
     }
-    
-    
+
     T& back() {
         if (empty()) {
             throw std::out_of_range("List is empty!");
         }
         return static_cast<Node*>(tail_->prev)->data_;
-                
-    } 
+    }
 
     const T& back() const {
         if (empty()) {
@@ -287,9 +291,9 @@ private:
         return static_cast<Node*>(tail_->prev)->data_;
     }
 
-
     iterator erase(iterator position) {
-        if (position == end()) return end();
+        if (position == end())
+            return end();
 
         BaseNode* node = position.node_;
         iterator next = node->next;
@@ -311,7 +315,7 @@ private:
         Node* new_node = node_allocator_.allocate(1);
         try {
             std::allocator_traits<NodeAllocator>::construct(node_allocator_,
-                    static_cast<Node*>(new_node), std::forward<Args>(args)...);
+                                                            static_cast<Node*>(new_node), std::forward<Args>(args)...);
 
             new_node->prev = position.node_->prev;
             new_node->next = position.node_;
@@ -332,7 +336,6 @@ private:
         }
     }
 
-
     iterator insert(iterator position, const T& value) {
         return emplace(position, value);
     }
@@ -341,4 +344,4 @@ private:
         return emplace(position, std::move(value));
     }
 };
-}
+}  // namespace data_structures::containers

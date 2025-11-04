@@ -7,10 +7,10 @@ namespace data_structures::containers {
 
 template <typename T>
 class BinaryHeap {
-private:
+  private:
     DynamicArray<T> data;
 
-public:
+  public:
     BinaryHeap() = default;
 
     BinaryHeap(const BinaryHeap& other) : data(other.data) {}
@@ -138,4 +138,4 @@ DynamicArray<T> BinaryHeap<T>::get_elements() const {
     }
     return elements;
 }
-}
+}  // namespace data_structures::containers

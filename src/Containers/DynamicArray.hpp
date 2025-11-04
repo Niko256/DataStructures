@@ -14,14 +14,12 @@ namespace data_structures::containers {
 template <typename T, typename Allocator = std::allocator<T>>
 class DynamicArray {
   private:
-
     T* data_;
     size_t size_;
     size_t capacity_;
     Allocator allocator_;
 
   public:
-  
     using allocator_type = Allocator;
     using value_type = T;
     using pointer = typename std::allocator_traits<Allocator>::pointer;
@@ -35,7 +33,7 @@ class DynamicArray {
 
     DynamicArray() : data_(nullptr), size_(0), capacity_(0) {}
 
-    template<typename U>
+    template <typename U>
     DynamicArray(const DynamicArray<U>& other) : data_(nullptr), size_(0), capacity_(0) {
         reserve(other.size());
         for (const auto& item : other) {
@@ -54,8 +52,7 @@ class DynamicArray {
             for (size_t i = 0; i < n; ++i) {
                 std::allocator_traits<Allocator>::construct(allocator_, data_ + i);
             }
-        }
-        catch (...) {
+        } catch (...) {
             throw std::bad_alloc();
         }
     }
@@ -138,7 +135,7 @@ class DynamicArray {
     void assign(InputIt first, InputIt last) {
         clear();
         size_t count = std::distance(first, last);
-        
+
         if (count > capacity_) {
             reserve(count);
         }
@@ -206,7 +203,7 @@ class DynamicArray {
     const_iterator cend() const noexcept {
         return data_ + size_;
     }
-    
+
     reverse_iterator rbegin() noexcept {
         return reverse_iterator(end());
     }
@@ -269,7 +266,7 @@ class DynamicArray {
 
     template <typename U>
     iterator insert(iterator pos, U&& value) {
-        size_t index = pos - begin();  
+        size_t index = pos - begin();
         insert(index, std::forward<U>(value));
         return begin() + index;
     }
@@ -298,7 +295,6 @@ class DynamicArray {
         size_ += count;
     }
 
-
     template <typename InputIt>
     iterator insert(iterator position, InputIt first, InputIt last) {
         size_t index = position - begin();
@@ -309,7 +305,7 @@ class DynamicArray {
         }
 
         for (size_t i = size_ + count - 1; i >= index + count && i < size_ + count; --i) {
-            
+
             std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i - count]));
 
             std::allocator_traits<Allocator>::destroy(allocator_, data_ + i - count);
@@ -323,7 +319,7 @@ class DynamicArray {
         size_ += count;
         return begin() + index;
     }
-    
+
     void insert(size_t index, std::initializer_list<T> ilist) {
         insert(index, ilist.begin(), ilist.end());
     }
@@ -360,7 +356,6 @@ class DynamicArray {
         erase_at_index(index);
         return begin() + index;
     }
-
 
     void erase_at_index(size_t index) {
         if (index >= size_) {
@@ -427,4 +422,4 @@ class DynamicArray {
         return size_ == 0;
     }
 };
-}
+}  // namespace data_structures::containers
