@@ -3,7 +3,6 @@
 
 #include "../src/Concurrency/Fiber/Fiber.hpp"
 #include "Go.hpp"
-#include <fmt/printf.h>
 #include <gtest/gtest.h>
 #include <memory>
 
