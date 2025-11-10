@@ -1,5 +1,7 @@
 #include "../Coroutine/Coro.hpp"
 #include "../ThreadPool/ThreadPool.hpp"
+#include <atomic>
+#include <exception>
 #include <functional>
 #include <vvv/list.hpp>
 
@@ -7,13 +9,15 @@ namespace ds::concurrency::runtime {
 
 // Fiber = Stackful coroutine x Scheduler
 
+using Scheduler = ds::concurrency::ThreadPool;
+using Procedure = std::function<void()>;
+
 class Fiber : public vvv::IntrusiveListNode<Fiber> {
   private:
-    using Scheduler = ds::concurrency::ThreadPool;
-    using Procedure = std::function<void()>;
-
     ds::concurrency::Coroutine coro_;
     Scheduler& sched_;
+
+    static thread_local Fiber* current_;
 
   public:
     explicit Fiber(Scheduler&, Procedure);
@@ -22,9 +26,13 @@ class Fiber : public vvv::IntrusiveListNode<Fiber> {
 
     void step();
 
-    static void self();
+    static void set_current(Fiber*);
 
-    [[nodiscard]] Scheduler* get_current_scheduler();
+    static Fiber* current();
+
+    Coroutine& get_coro() const;
+
+    [[nodiscard]] Scheduler& current_scheduler() const;
 };
 
 };  // namespace ds::concurrency::runtime
