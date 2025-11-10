@@ -8,7 +8,7 @@ SpacesBeforeTrailingComments: 2
 AlignOperands: Align
 AccessModifierOffset: -2
 ColumnLimit: 0
-MaxEmptyLinesToKeep: 2          
+MaxEmptyLinesToKeep: 2
 SeparateDefinitionBlocks: Always
-IncludeBlocks: Preserve 
-IndentPPDirectives: AfterHash 
+IncludeBlocks: Preserve
+IndentPPDirectives: AfterHash

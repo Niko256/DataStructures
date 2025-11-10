@@ -39,9 +39,7 @@ FetchContent_MakeAvailable(googletest smhasher sure sure-stack vvv)
 
 # ALIASES
 IF(sure_POPULATED)
-  ADD_LIBRARY(third_party_sure INTERFACE)
-  TARGET_INCLUDE_DIRECTORIES(third_party_sure INTERFACE
-      ${sure_SOURCE_DIR}/source)
+  ADD_LIBRARY(third_party_sure ALIAS sure)
 ENDIF()
 
 IF(sure-stack_POPULATED)

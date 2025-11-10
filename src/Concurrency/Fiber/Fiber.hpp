@@ -1,26 +1,25 @@
+#pragma once
+
 #include "../Coroutine/Coro.hpp"
+#include "../Coroutine/Routine.hpp"
 #include "../ThreadPool/ThreadPool.hpp"
-#include <atomic>
-#include <exception>
-#include <functional>
 #include <vvv/list.hpp>
 
-namespace ds::concurrency::runtime {
+namespace ds::runtime {
 
 // Fiber = Stackful coroutine x Scheduler
 
-using Scheduler = ds::concurrency::ThreadPool;
-using Procedure = std::function<void()>;
+using Scheduler = ds::runtime::ThreadPool;
 
 class Fiber : public vvv::IntrusiveListNode<Fiber> {
   private:
-    ds::concurrency::Coroutine coro_;
+    ds::runtime::Coroutine coro_;
     Scheduler& sched_;
 
     static thread_local Fiber* current_;
 
   public:
-    explicit Fiber(Scheduler&, Procedure);
+    explicit Fiber(Scheduler&, Routine);
 
     void schedule();
 
@@ -30,9 +29,9 @@ class Fiber : public vvv::IntrusiveListNode<Fiber> {
 
     static Fiber* current();
 
-    Coroutine& get_coro() const;
+    Coroutine& get_coro();
 
     [[nodiscard]] Scheduler& current_scheduler() const;
 };
 
-};  // namespace ds::concurrency::runtime
+};  // namespace ds::runtime

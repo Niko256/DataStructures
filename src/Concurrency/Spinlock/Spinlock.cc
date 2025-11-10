@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <atomic>
 
-namespace ds::concurrency {
+namespace ds::sync {
 
 void Spinlock::lock() noexcept {
     // Initial value for exp.backoff (exponintial backoff reduces contention by increasing delay for each retry)
@@ -62,4 +62,4 @@ void Spinlock::unlock() noexcept {
     // releasing the lock
     flag_.store(false);
 }
-}  // namespace ds::concurrency
+}  // namespace ds::sync

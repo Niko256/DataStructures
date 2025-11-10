@@ -1,12 +1,13 @@
 #include "Fiber.hpp"
-#include <exception>
+#include "Coro.hpp"
 
-namespace ds::concurrency::runtime {
+namespace ds::runtime {
 
 thread_local Fiber* Fiber::current_ = nullptr;
 
-Fiber::Fiber(Scheduler& sched, Procedure routine)
-    : sched_(sched), coro_(std::move(routine)) {}
+Fiber::Fiber(Scheduler& sched, Routine routine)
+    : sched_(sched),
+      coro_(std::move(routine)) {}
 
 void Fiber::schedule() {
     sched_.submit([this] {
@@ -41,7 +42,7 @@ void Fiber::set_current(Fiber* new_current) {
 }
 
 /* get internal coroutine */
-Coroutine& Fiber::get_coro() const {
+Coroutine& Fiber::get_coro() {
     return coro_;
 }
 
@@ -49,4 +50,4 @@ Coroutine& Fiber::get_coro() const {
 Scheduler& Fiber::current_scheduler() const {
     return sched_;
 }
-};  // namespace ds::concurrency::runtime
+};  // namespace ds::runtime

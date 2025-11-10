@@ -18,7 +18,6 @@ TARGET_LINK_LIBRARIES(SpinlockTests PRIVATE
   Spinlock
   gtest_main
 )
-gtest_discover_tests(SpinlockTests)
 
 
 ADD_EXECUTABLE(ThreadPoolTests ThreadPoolTests.cc)
@@ -26,7 +25,6 @@ TARGET_LINK_LIBRARIES(ThreadPoolTests PRIVATE
   ThreadPool
   gtest_main
 )
-gtest_discover_tests(ThreadPoolTests)
 
 
 ADD_EXECUTABLE(SmartPtrsTests SmartPtrsTests.cc)
@@ -34,4 +32,19 @@ TARGET_LINK_LIBRARIES(SmartPtrsTests PRIVATE
   SmartPtrs
   gtest_main
 )
-gtest_discover_tests(SmartPtrsTests)
+
+ADD_EXECUTABLE(FiberTests FiberTests.cc)
+TARGET_LINK_LIBRARIES(FiberTests PRIVATE
+  Fiber
+  ThreadPool
+  Coroutine
+  third_party_sure
+  gtest_main
+)
+
+gtest_discover_tests(
+  SpinlockTests
+  ThreadPoolTests
+  SmartPtrsTests
+  FiberTests
+)

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <functional>
+#include "Routine.hpp"
 #include <sure/context.hpp>
 #include <sure/stack/mmap.hpp>
 #include <sure/trampoline.hpp>
 
-namespace ds::concurrency {
+namespace ds::runtime {
 
 /*
  * Stackful coroutine
@@ -22,37 +22,9 @@ namespace ds::concurrency {
  *
  */
 class Coroutine : private sure::ITrampoline {
-  private:
-    sure::ExecutionContext callee_context_; /* The coroutine's execution context */
-    sure::ExecutionContext caller_context_; /* Caller's execution context */
-    sure::stack::GuardedMmapExecutionStack stack_;
-    bool is_done_ = false;
-
-    /*
-     * ! SuspendHandle provides controlled access to the suspension operation on the coro.
-     * Provides safe suspension capability while protecting it from the coroutine's
-     * internal statefrom direct manipulation
-     */
-    struct SuspendHandle {
-      private:
-        friend class Coroutine;
-
-        Coroutine* self_;
-
-      public:
-        explicit SuspendHandle(Coroutine* coro) : self_(coro) {}
-
-        void suspend();
-    };
-
-    /* ! User-provided procedure that receives suspension capability */
-    using Body = std::function<void(SuspendHandle)>;
-
-    Body f_;
-
   public:
     /* Constructs coro with the given procedure */
-    explicit Coroutine(Body);
+    explicit Coroutine(Routine);
 
     void suspend();
 
@@ -79,6 +51,16 @@ class Coroutine : private sure::ITrampoline {
 
     /* Allocates guarded stack for coroutine execution */
     static sure::stack::GuardedMmapExecutionStack allocate_stack(size_t size = 256 * 1024);
+
+
+  private:
+    sure::ExecutionContext callee_context_; /* The coroutine's execution context */
+    sure::ExecutionContext caller_context_; /* Caller's execution context */
+    sure::stack::GuardedMmapExecutionStack stack_;
+    bool is_done_ = false;
+
+
+    Routine f_;
 };  // namespace sure::ITrampoline
 
-};  // namespace ds::concurrency
+};  // namespace ds::runtime

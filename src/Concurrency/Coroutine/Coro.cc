@@ -2,10 +2,10 @@
 #include "sure/stack/mmap.hpp"
 #include <cassert>
 
-namespace ds::concurrency {
+namespace ds::runtime {
 
-Coroutine::Coroutine(Body func) : f_(std::move(func)),
-                                  stack_(Coroutine::allocate_stack()) {
+Coroutine::Coroutine(Routine func) : f_(std::move(func)),
+                                     stack_(Coroutine::allocate_stack()) {
     callee_context_.Setup(stack_.MutView(), this);
 }
 
@@ -15,10 +15,6 @@ sure::stack::GuardedMmapExecutionStack Coroutine::allocate_stack(size_t size) {
 
 void Coroutine::suspend() {
     callee_context_.SwitchTo(caller_context_);
-}
-
-void Coroutine::SuspendHandle::suspend() {
-    self_->suspend();
 }
 
 /* Resuming the execution of the coroutine
@@ -34,13 +30,10 @@ bool Coroutine::is_done() const noexcept {
 }
 
 void Coroutine::Run() noexcept {
-    SuspendHandle suspend_context(this);
-
-    /* SuspendContext is trivially copiable */
-    f_(suspend_context);
+    f_();
 
     is_done_ = true;
     callee_context_.ExitTo(caller_context_);
 }
 
-};  // namespace ds::concurrency
+};  // namespace ds::runtime

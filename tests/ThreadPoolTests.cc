@@ -1,4 +1,3 @@
-#include "../src/Concurrency/ThreadPool/Queue.hpp"
 #include "../src/Concurrency/ThreadPool/ThreadPool.hpp"
 #include "../src/Concurrency/WaitGroup/WaitGroup.hpp"
 #include <atomic>
@@ -6,20 +5,14 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include <mutex>
-#include <numeric>
 #include <set>
 #include <thread>
 
 
 using namespace std::chrono_literals;
 
-using WaitGroup = ds::concurrency::WaitGroup;
-using ThreadPool = ds::concurrency::ThreadPool;
-
-// =============================================
-// ============ WAITGROUP TESTS ============
-// =============================================
-//
+using WaitGroup = ds::sync::WaitGroup;
+using ThreadPool = ds::runtime::ThreadPool;
 
 TEST(WaitGroupTest, ConcurrentDone) {
     WaitGroup wg;
@@ -63,10 +56,6 @@ TEST(WaitGroupTest, BlocksUntilDone) {
     ASSERT_TRUE(task_done);
 }
 
-// =============================================
-// ============ TREADPOOL TESTS ============
-// =============================================
-//
 class ThreadPoolTests : public ::testing::Test {
   protected:
     std::unique_ptr<ThreadPool> pool_;

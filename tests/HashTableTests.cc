@@ -509,3 +509,8 @@ TEST_F(HashTableTest, HashDistributionTest) {
 
     EXPECT_LT(variance, average_keys_per_bucket * average_keys_per_bucket * 4);
 }
+
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

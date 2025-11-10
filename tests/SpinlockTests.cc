@@ -8,7 +8,7 @@
 #include <vector>
 
 
-using Spinlock = ds::concurrency::Spinlock;
+using Spinlock = ds::sync::Spinlock;
 
 class SpinlockBasicTest : public ::testing::Test {
   protected:

@@ -1,6 +1,6 @@
 #include "ThreadPool.hpp"
 
-namespace ds::concurrency {
+namespace ds::runtime {
 
 ThreadPool::ThreadPool(size_t num_threads) : num_threads_(num_threads > 0 ? num_threads : std::thread::hardware_concurrency()) {}
 
@@ -95,4 +95,4 @@ void ThreadPool::worker_loop() {
         }
     }
 }
-};  // namespace ds::concurrency
+};  // namespace ds::runtime

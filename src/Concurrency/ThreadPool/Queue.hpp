@@ -5,7 +5,7 @@
 #include <optional>
 #include <queue>
 
-namespace ds::concurrency {
+namespace ds::runtime {
 
 template <typename T>
 class UnboundedBlockingQueue {
@@ -38,4 +38,4 @@ class UnboundedBlockingQueue {
 };
 
 #include "Queue_inl.hpp"
-};  // namespace ds::concurrency
+};  // namespace ds::runtime

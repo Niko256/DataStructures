@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <mutex>
 
-namespace ds::concurrency {
+namespace ds::sync {
 
 class WaitGroup {
   private:
@@ -39,4 +39,4 @@ class WaitGroup {
 };
 
 
-};  // namespace ds::concurrency
+};  // namespace ds::sync
