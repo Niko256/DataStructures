@@ -3,9 +3,9 @@
 
 #include "../src/Concurrency/Fiber/Fiber.hpp"
 #include "Go.hpp"
+#include <fmt/printf.h>
 #include <gtest/gtest.h>
 #include <memory>
-
 
 using namespace ds::runtime;
 
@@ -32,8 +32,11 @@ TEST_F(FiberTest, SimpleExecution) {
     wg.add(1);
 
     ds::fiber::go(*sched_, [&wg] {
+        // fmt::print("Here we go...");
         wg.done();
     });
+
+    wg.wait();
 }
 
 TEST_F(FiberTest, AfewSteps) {
@@ -45,7 +48,7 @@ TEST_F(FiberTest, ExceptionInFiber) {
 TEST_F(FiberTest, TheHordeOfFibers) {
 }
 
-TEST(FiberTest, Rescheduling1) {
+TEST_F(FiberTest, Rescheduling1) {
 }
 
 TEST_F(FiberTest, Rescheduling2) {

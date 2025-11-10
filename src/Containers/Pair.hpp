@@ -95,10 +95,10 @@ Pair<T1, T2> make_my_pair(T1&& first_, T2&& second_) {
 
 namespace std {
 template <typename T1, typename T2>
-struct tuple_size<data_structures::containers::Pair<T1, T2>> : integral_constant<size_t, 2> {};
+struct tuple_size<ds::containers::Pair<T1, T2>> : integral_constant<size_t, 2> {};
 
 template <size_t I, typename T1, typename T2>
-struct tuple_element<I, data_structures::containers::Pair<T1, T2>> {
+struct tuple_element<I, ds::containers::Pair<T1, T2>> {
     using type = typename conditional<I == 0, T1, T2>::type;
 };
 }  // namespace std

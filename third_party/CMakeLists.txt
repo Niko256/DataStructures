@@ -49,12 +49,6 @@ IF(sure-stack_POPULATED)
 ENDIF()
 
 IF (vvv_POPULATED)
-  MESSAGE(STATUS "vvv source dir: ${vvv_SOURCE_DIR}")
-
-  EXECUTE_PROCESS(COMMAND find ${vvv_SOURCE_DIR} -name "*.hpp" -o -name "*.h"
-                  OUTPUT_VARIABLE VVV_HEADERS)
-  MESSAGE(STATUS "Found vvv headers: ${VVV_HEADERS}")
-
   ADD_LIBRARY(third_party_vvv INTERFACE)
   TARGET_INCLUDE_DIRECTORIES(third_party_vvv INTERFACE
     ${vvv_SOURCE_DIR}/source)
