@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace data_structures::containers {
+namespace ds::containers {
 
 template <typename T>
 class Queue {
@@ -126,4 +126,4 @@ class Queue {
         std::cout << std::endl;
     }
 };
-}  // namespace data_structures::containers
+}  // namespace ds::containers

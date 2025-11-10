@@ -3,7 +3,7 @@
 #include <tuple>
 #include <utility>
 
-namespace data_structures::containers {
+namespace ds::containers {
 
 template <typename T1, typename T2>
 class Pair {
@@ -91,7 +91,7 @@ template <typename T1, typename T2>
 Pair<T1, T2> make_my_pair(T1&& first_, T2&& second_) {
     return Pair<T1, T2>(std::forward<T1>(first_), std::forward<T2>(second_));
 }
-}  // namespace data_structures::containers
+}  // namespace ds::containers
 
 namespace std {
 template <typename T1, typename T2>

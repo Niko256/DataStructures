@@ -28,15 +28,15 @@ bool Spinlock::try_lock_for(const ::std::chrono::duration<Rep, Period>& rel_time
             }
 
             // If the lock becomes free => break early to attempt of acquiring the lock  in outer loop
-            if (!flag_.load(::std::memory_order_relaxed)) {
+            if (!flag_.load()) {
                 break;
             }
         }
 
         // Attempt to acquire the lock after backoff
         // This check is outside the inner backoff loop to limit frequency of exchanges
-        if (!flag_.load(::std::memory_order_relaxed)) {
-            if (!flag_.exchange(true, ::std::memory_order_acquire)) {
+        if (!flag_.load()) {
+            if (!flag_.exchange(true)) {
                 return true;
             }
         }
@@ -77,13 +77,13 @@ bool Spinlock::try_lock_until(const ::std::chrono::time_point<Clock, Duration>& 
             }
 
             // If the lock becomes free => break
-            if (!flag_.load(::std::memory_order_relaxed)) {
+            if (!flag_.load()) {
                 break;
             }
         }
 
-        if (!flag_.load(::std::memory_order_relaxed)) {
-            if (!flag_.exchange(true, ::std::memory_order_acquire)) {  // Set
+        if (!flag_.load()) {
+            if (!flag_.exchange(true)) {  // Set
                 return true;
             }
         }

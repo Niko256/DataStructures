@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace data_structures::smart_ptrs {
+namespace ds::smart_ptrs {
 
 template <typename T>
 class WeakPtr {
@@ -117,4 +117,4 @@ class WeakPtr {
         ctr_block_ = nullptr;
     }
 };
-}  // namespace data_structures::smart_ptrs
+}  // namespace ds::smart_ptrs

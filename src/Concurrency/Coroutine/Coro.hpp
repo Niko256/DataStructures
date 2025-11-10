@@ -5,6 +5,8 @@
 #include <sure/stack/mmap.hpp>
 #include <sure/trampoline.hpp>
 
+namespace ds::concurrency {
+
 /*
  * Stackful coroutine
  *
@@ -77,4 +79,6 @@ class Coroutine : private sure::ITrampoline {
 
     /* Allocates guarded stack for coroutine execution */
     static sure::stack::GuardedMmapExecutionStack allocate_stack(size_t size = 256 * 1024);
-};
+};  // namespace sure::ITrampoline
+
+};  // namespace ds::concurrency

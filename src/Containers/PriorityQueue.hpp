@@ -4,7 +4,7 @@
 #include <iterator>
 #include <type_traits>
 
-namespace data_structures::containers {
+namespace ds::containers {
 
 template <typename T>
 class PriorityNode {
@@ -187,4 +187,4 @@ class PriorityQueue {
         other.clear();
     }
 };
-}  // namespace data_structures::containers
+}  // namespace ds::containers

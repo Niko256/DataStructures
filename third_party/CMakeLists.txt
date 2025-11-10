@@ -22,28 +22,48 @@ FetchContent_Declare(
 
 
 FetchContent_Declare(
-  sure-stack
-  GIT_REPOSITORY https://gitlab.com/Lipovsky/sure-stack.git
-  GIT_TAG master)
+    sure-stack
+    GIT_REPOSITORY https://gitlab.com/Lipovsky/sure-stack.git
+    GIT_TAG master
+)
 
-FetchContent_MakeAvailable(googletest smhasher sure sure-stack)
+FetchContent_Declare(
+    vvv
+    GIT_REPOSITORY https://gitlab.com/Lipovsky/vvv.git
+    GIT_TAG master
+)
+
+
+FetchContent_MakeAvailable(googletest smhasher sure sure-stack vvv)
 
 
 # ALIASES
-if(sure_POPULATED)
-  add_library(third_party_sure INTERFACE)
-  target_include_directories(third_party_sure INTERFACE
+IF(sure_POPULATED)
+  ADD_LIBRARY(third_party_sure INTERFACE)
+  TARGET_INCLUDE_DIRECTORIES(third_party_sure INTERFACE
       ${sure_SOURCE_DIR}/source)
-endif()
+ENDIF()
 
-if(sure-stack_POPULATED)
-  add_library(third_party_sure_stack INTERFACE)
-  target_include_directories(third_party_sure_stack INTERFACE
+IF(sure-stack_POPULATED)
+  ADD_LIBRARY(third_party_sure_stack INTERFACE)
+  TARGET_INCLUDE_DIRECTORIES(third_party_sure_stack INTERFACE
       ${sure-stack_SOURCE_DIR}/source)
-endif()
+ENDIF()
 
-if(smhasher_POPULATED)
-  add_library(third_party_smhasher INTERFACE)
-  target_include_directories(third_party_smhasher INTERFACE
+IF (vvv_POPULATED)
+  MESSAGE(STATUS "vvv source dir: ${vvv_SOURCE_DIR}")
+
+  EXECUTE_PROCESS(COMMAND find ${vvv_SOURCE_DIR} -name "*.hpp" -o -name "*.h"
+                  OUTPUT_VARIABLE VVV_HEADERS)
+  MESSAGE(STATUS "Found vvv headers: ${VVV_HEADERS}")
+
+  ADD_LIBRARY(third_party_vvv INTERFACE)
+  TARGET_INCLUDE_DIRECTORIES(third_party_vvv INTERFACE
+    ${vvv_SOURCE_DIR}/source)
+ENDIF()
+
+IF(smhasher_POPULATED)
+  ADD_LIBRARY(third_party_smhasher INTERFACE)
+  TARGET_INCLUDE_DIRECTORIES(third_party_smhasher INTERFACE
       ${smhasher_SOURCE_DIR}/src)
-endif()
+ENDIF()

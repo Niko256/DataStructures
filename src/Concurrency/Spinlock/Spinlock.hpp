@@ -4,7 +4,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace data_structures::concurrency {
+namespace ds::concurrency {
 
 class Spinlock {
   private:
@@ -36,4 +36,4 @@ class Spinlock {
 };
 
 #include "Spinlock_inl.hpp"
-}  // namespace data_structures::concurrency
+}  // namespace ds::concurrency

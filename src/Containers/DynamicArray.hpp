@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace data_structures::containers {
+namespace ds::containers {
 
 template <typename T, typename Allocator = std::allocator<T>>
 class DynamicArray {
@@ -422,4 +422,4 @@ class DynamicArray {
         return size_ == 0;
     }
 };
-}  // namespace data_structures::containers
+}  // namespace ds::containers

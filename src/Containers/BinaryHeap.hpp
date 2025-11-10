@@ -3,7 +3,7 @@
 #include "DynamicArray.hpp"
 #include <stdexcept>
 
-namespace data_structures::containers {
+namespace ds::containers {
 
 template <typename T>
 class BinaryHeap {
@@ -138,4 +138,4 @@ DynamicArray<T> BinaryHeap<T>::get_elements() const {
     }
     return elements;
 }
-}  // namespace data_structures::containers
+}  // namespace ds::containers

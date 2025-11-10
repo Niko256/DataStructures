@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace data_structures::containers {
+namespace ds::containers {
 
 template <typename Key, typename Value,
           typename Hash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>,
@@ -618,4 +618,4 @@ class HashTable {
         return prime;
     }
 };
-}  // namespace data_structures::containers
+}  // namespace ds::containers

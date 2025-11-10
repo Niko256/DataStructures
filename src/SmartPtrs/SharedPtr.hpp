@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace data_structures::smart_ptrs {
+namespace ds::smart_ptrs {
 
 template <typename T>
 class WeakPtr;
@@ -167,4 +167,4 @@ template <typename T>
 bool operator!=(std::nullptr_t, const SharedPtr<T>& ptr) noexcept {
     return ptr != nullptr;
 }
-}  // namespace data_structures::smart_ptrs
+}  // namespace ds::smart_ptrs

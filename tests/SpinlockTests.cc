@@ -8,12 +8,7 @@
 #include <vector>
 
 
-using Spinlock = data_structures::concurrency::Spinlock;
-
-// =============================================
-// ============ SINGLE-THREAD TESTS ============
-// =============================================
-
+using Spinlock = ds::concurrency::Spinlock;
 
 class SpinlockBasicTest : public ::testing::Test {
   protected:
@@ -37,10 +32,6 @@ TEST_F(SpinlockBasicTest, DoubleLockFails) {
     EXPECT_FALSE(lock_.try_lock());
     lock_.unlock();
 }
-
-// =============================================
-// =========== MULTI-THREADED TESTS ============
-// =============================================
 
 class SpinlockConcurrencyTests : public ::testing::Test {
 
@@ -138,10 +129,6 @@ TEST_F(SpinlockConcurrencyTests, TryLockContention) {
     EXPECT_GE(successfully_tries.load(), num_threads * operations_per_thread);
 }
 
-// =============================================
-// ============== TIMEOUT TESTS ================
-// =============================================
-
 class SpinlockTimeoutTest : public ::testing::Test {
   protected:
     Spinlock lock_;
@@ -211,10 +198,6 @@ TEST_F(SpinlockTimeoutTest, TryLockUntilInPast) {
     auto past_time = std::chrono::steady_clock::now() - std::chrono::seconds(1);
     EXPECT_FALSE(lock_.try_lock_until(past_time));
 }
-
-// =============================================
-// ========== PERFORMANCE TESTS ================
-// =============================================
 
 class SpinlockPerfTest : public ::testing::Test {
   protected:

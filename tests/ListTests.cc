@@ -3,7 +3,7 @@
 #include <string>
 
 template <typename T>
-using List = data_structures::containers::List<T>;
+using List = ds::containers::List<T>;
 
 class ListTest : public ::testing::Test {
   protected:

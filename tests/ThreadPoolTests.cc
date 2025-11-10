@@ -13,8 +13,8 @@
 
 using namespace std::chrono_literals;
 
-using WaitGroup = data_structures::concurrency::WaitGroup;
-using ThreadPool = data_structures::concurrency::ThreadPool;
+using WaitGroup = ds::concurrency::WaitGroup;
+using ThreadPool = ds::concurrency::ThreadPool;
 
 // =============================================
 // ============ WAITGROUP TESTS ============

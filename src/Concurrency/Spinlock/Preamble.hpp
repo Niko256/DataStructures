@@ -1,4 +1,3 @@
-
 #if defined(__i386__) || defined(__x86_64__)
 #    include <immintrin.h>
 #    define CPU_PAUSE() _mm_pause()

@@ -8,7 +8,7 @@
 #include <thread>
 #include <vector>
 
-namespace data_structures::concurrency {
+namespace ds::concurrency {
 
 // This type represents fundamental unit of work in our threadpool
 // as polymorphic wrapper for callable objects
@@ -74,4 +74,4 @@ class ThreadPool {
   private:
     void worker_loop();
 };
-};  // namespace data_structures::concurrency
+};  // namespace ds::concurrency

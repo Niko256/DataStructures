@@ -2,6 +2,8 @@
 #include "sure/stack/mmap.hpp"
 #include <cassert>
 
+namespace ds::concurrency {
+
 Coroutine::Coroutine(Body func) : f_(std::move(func)),
                                   stack_(Coroutine::allocate_stack()) {
     callee_context_.Setup(stack_.MutView(), this);
@@ -40,3 +42,5 @@ void Coroutine::Run() noexcept {
     is_done_ = true;
     callee_context_.ExitTo(caller_context_);
 }
+
+};  // namespace ds::concurrency
